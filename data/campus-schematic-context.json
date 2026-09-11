@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "fixedExtent": {
+    "west": 120.14590,
+    "east": 120.16115,
+    "north": 31.90918,
+    "south": 31.90105,
+    "width": 2038,
+    "height": 1279,
+    "crs": "EPSG:4326"
+  },
+  "source": {
+    "name": "user-supplied legacy campus guide map",
+    "path": "public/map.jpg",
+    "sourceCrs": "normalized legacy image coordinates",
+    "confidence": "low",
+    "purpose": "orientation context only",
+    "disclaimer": "These water and circulation shapes are simplified visual readings of the legacy guide map. They are not surveyed geometry, must not be used for measurement, and are intentionally rendered as a separate schematic layer.",
+    "baiduGeometryUsed": false
+  },
+  "legacyAffineToWgs84": {
+    "description": "Least-squares affine fit of the 12 legacy image anchors already recorded by the project; coefficients apply to [normalizedX, normalizedY, 1].",
+    "longitude": [0.014534000119806212, 0.0004122456258528473, 120.14604931383917],
+    "latitude": [0.00023036692873090736, -0.007654753647940993, 31.90883312450345]
+  },
+  "water": [
+    {
+      "id": "legacy-east-west-waterway",
+      "kind": "waterway-centerline",
+      "confidence": "low",
+      "strokeWidthLegacyPixels": 20,
+      "coordinates": [
+        [0.151, 0.545],
+        [0.241, 0.529],
+        [0.325, 0.494],
+        [0.414, 0.466],
+        [0.506, 0.458],
+        [0.592, 0.449],
+        [0.685, 0.423],
+        [0.784, 0.405],
+        [0.878, 0.392],
+        [0.936, 0.385]
+      ]
+    },
+    {
+      "id": "legacy-central-lake",
+      "kind": "waterbody",
+      "confidence": "low",
+      "coordinates": [
+        [0.321, 0.571],
+        [0.351, 0.519],
+        [0.405, 0.480],
+        [0.455, 0.474],
+        [0.487, 0.497],
+        [0.515, 0.493],
+        [0.557, 0.470],
+        [0.595, 0.494],
+        [0.620, 0.553],
+        [0.623, 0.640],
+        [0.606, 0.693],
+        [0.558, 0.699],
+        [0.519, 0.713],
+        [0.475, 0.699],
+        [0.424, 0.661],
+        [0.377, 0.640],
+        [0.348, 0.608],
+        [0.321, 0.571]
+      ]
+    }
+  ],
+  "circulation": [
+    {
+      "id": "legacy-north-axis",
+      "confidence": "low",
+      "coordinates": [[0.506, 0.267], [0.507, 0.340], [0.508, 0.414], [0.505, 0.475]]
+    },
+    {
+      "id": "legacy-south-axis",
+      "confidence": "low",
+      "coordinates": [[0.505, 0.565], [0.505, 0.664], [0.506, 0.760], [0.506, 0.888]]
+    },
+    {
+      "id": "legacy-west-central-approach",
+      "confidence": "low",
+      "coordinates": [[0.077, 0.553], [0.168, 0.551], [0.251, 0.524], [0.322, 0.475], [0.381, 0.445], [0.444, 0.447]]
+    },
+    {
+      "id": "legacy-east-central-approach",
+      "confidence": "low",
+      "coordinates": [[0.565, 0.445], [0.653, 0.429], [0.747, 0.410], [0.837, 0.397], [0.925, 0.385]]
+    },
+    {
+      "id": "legacy-lake-west-loop",
+      "confidence": "low",
+      "coordinates": [[0.437, 0.478], [0.397, 0.495], [0.373, 0.536], [0.374, 0.604], [0.403, 0.649], [0.451, 0.677]]
+    },
+    {
+      "id": "legacy-lake-east-loop",
+      "confidence": "low",
+      "coordinates": [[0.560, 0.473], [0.592, 0.502], [0.604, 0.555], [0.604, 0.625], [0.580, 0.678], [0.548, 0.696]]
+    }
+  ],
+  "labels": [
+    { "id": "legacy-label-north-gate", "text": "北门", "kind": "gate", "confidence": "low", "coordinate": [0.506, 0.268] },
+    { "id": "legacy-label-south-gate", "text": "南门", "kind": "gate", "confidence": "low", "coordinate": [0.506, 0.888] },
+    { "id": "legacy-label-west-gate", "text": "西门", "kind": "gate", "confidence": "low", "coordinate": [0.078, 0.553] },
+    { "id": "legacy-label-northeast-gate", "text": "东北门", "kind": "gate", "confidence": "low", "coordinate": [0.931, 0.421] },
+    { "id": "legacy-label-library", "text": "图书馆", "kind": "building", "confidence": "low", "coordinate": [0.508, 0.550] },
+    { "id": "legacy-label-gymnasium", "text": "体育馆", "kind": "building", "confidence": "low", "coordinate": [0.124, 0.428] },
+    { "id": "legacy-label-training", "text": "工程训练中心", "kind": "building", "confidence": "low", "coordinate": [0.214, 0.431] },
+    { "id": "legacy-label-exchange", "text": "国际学术交流中心", "kind": "building", "confidence": "low", "coordinate": [0.132, 0.648] }
+  ]
+}

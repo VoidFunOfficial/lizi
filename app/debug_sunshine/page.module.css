@@ -1,0 +1,399 @@
+.page {
+  --debug-ink: #171816;
+  --debug-paper: #f4f4f0;
+  --debug-panel: #fffffc;
+  --debug-muted: #686a64;
+  --debug-line: #d7d8d2;
+  height: 100dvh;
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto minmax(320px, 1fr) auto;
+  overflow: hidden;
+  background: var(--debug-paper);
+  color: var(--debug-ink);
+}
+
+.header {
+  min-height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--debug-line);
+  background: var(--debug-panel);
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mark {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 11px;
+  background: var(--debug-ink);
+  color: var(--debug-panel);
+}
+
+.mark svg {
+  width: 21px;
+  height: 21px;
+}
+
+.identity h1 {
+  margin: 1px 0 0;
+  font-size: 17px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.eyebrow {
+  display: block;
+  color: var(--debug-muted);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: 0.14em;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 11px;
+  border: 1px solid var(--debug-line);
+  border-radius: 9px;
+  color: var(--debug-ink);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.backLink:hover {
+  background: #edede8;
+}
+
+.backLink svg {
+  width: 14px;
+  height: 14px;
+}
+
+.mapPanel {
+  min-height: 0;
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: 18px;
+  background: #ddded8;
+}
+
+.map {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+}
+
+.shadows polygon {
+  fill: rgb(12 13 12 / 0.28);
+}
+
+.buildings polygon {
+  fill: rgb(18 19 17 / 0.3);
+  stroke: rgb(255 255 252 / 0.82);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.mapStatus,
+.legend {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  border: 1px solid rgb(23 24 22 / 0.14);
+  background: rgb(255 255 252 / 0.94);
+  box-shadow: 0 8px 28px rgb(23 24 22 / 0.1);
+}
+
+.mapStatus {
+  top: 28px;
+  left: 28px;
+  gap: 10px;
+  padding: 9px 12px 9px 9px;
+  border-radius: 12px;
+}
+
+.statusIcon {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--debug-ink);
+  color: var(--debug-panel);
+}
+
+.statusIcon svg {
+  width: 17px;
+  height: 17px;
+}
+
+.mapStatus strong,
+.mapStatus span {
+  display: block;
+}
+
+.mapStatus strong {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 12px;
+}
+
+.mapStatus div > span {
+  margin-top: 2px;
+  color: var(--debug-muted);
+  font-size: 10px;
+}
+
+.legend {
+  right: 28px;
+  bottom: 28px;
+  gap: 13px;
+  padding: 8px 11px;
+  border-radius: 10px;
+  color: var(--debug-muted);
+  font-size: 10px;
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.legend i {
+  width: 11px;
+  height: 11px;
+  display: block;
+  border-radius: 2px;
+}
+
+.shadowSwatch {
+  background: rgb(12 13 12 / 0.28);
+}
+
+.buildingSwatch {
+  border: 1px solid #81837e;
+  background: #343632;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: minmax(320px, 1fr) 150px repeat(2, minmax(215px, auto));
+  align-items: center;
+  gap: 24px;
+  padding: 16px 20px 18px;
+  border-top: 1px solid var(--debug-line);
+  background: var(--debug-panel);
+}
+
+.controlHeading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.controlHeading > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--debug-muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.controlHeading svg {
+  width: 14px;
+  height: 14px;
+}
+
+.controlHeading time {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 18px;
+  font-weight: 680;
+  letter-spacing: -0.04em;
+}
+
+.slider {
+  width: 100%;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--debug-ink);
+  cursor: ew-resize;
+}
+
+.ticks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3px;
+  color: var(--debug-muted);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 8px;
+}
+
+.dateControl {
+  display: grid;
+  gap: 7px;
+  color: var(--debug-muted);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.dateControl input {
+  width: 100%;
+  min-width: 0;
+  height: 34px;
+  padding: 0 9px;
+  border: 1px solid var(--debug-line);
+  border-radius: 9px;
+  background: var(--debug-panel);
+  color: var(--debug-ink);
+  font:
+    12px var(--font-geist-mono),
+    monospace;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(94px, 1fr));
+  gap: 8px 18px;
+  margin: 0;
+}
+
+.metrics div {
+  min-width: 0;
+}
+
+.metrics dt {
+  color: var(--debug-muted);
+  font-size: 9px;
+}
+
+.metrics dd {
+  margin: 2px 0 0;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.modelNote {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  max-width: 230px;
+  color: var(--debug-muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.modelNote svg {
+  width: 19px;
+  height: 19px;
+  flex: 0 0 auto;
+  color: var(--debug-ink);
+}
+
+@media (max-width: 980px) {
+  .page {
+    height: auto;
+    min-height: 100dvh;
+    grid-template-rows: auto auto auto;
+    overflow: auto;
+  }
+
+  .mapPanel {
+    min-height: auto;
+    aspect-ratio: 1.45;
+    padding: 10px;
+  }
+
+  .controls {
+    grid-template-columns: minmax(0, 1fr) 150px;
+  }
+
+  .metrics,
+  .modelNote {
+    grid-column: 1 / -1;
+  }
+
+  .modelNote {
+    max-width: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .header {
+    min-height: 62px;
+    padding: 10px 12px;
+  }
+
+  .mark {
+    width: 38px;
+    height: 38px;
+  }
+
+  .identity h1 {
+    font-size: 14px;
+  }
+
+  .eyebrow {
+    font-size: 8px;
+  }
+
+  .backLink {
+    padding: 8px;
+  }
+
+  .backLink span {
+    display: none;
+  }
+
+  .mapPanel {
+    aspect-ratio: 1.16;
+  }
+
+  .mapStatus {
+    top: 16px;
+    left: 16px;
+  }
+
+  .legend {
+    right: 16px;
+    bottom: 16px;
+  }
+
+  .controls {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    padding: 16px 14px 20px;
+  }
+
+  .dateControl,
+  .metrics,
+  .modelNote {
+    grid-column: auto;
+  }
+
+  .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

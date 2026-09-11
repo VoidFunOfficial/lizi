@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated file. Run: node scripts/generate-precise-basemap.mjs -->
+<svg xmlns="http://www.w3.org/2000/svg" width="2038" height="1279" viewBox="0 0 2038 1279" role="img" aria-labelledby="map-title map-description" data-crs="EPSG:4326" data-west="120.1459" data-east="120.16115" data-north="31.90918" data-south="31.90105">
+  <title id="map-title">南京理工大学江阴校区地理参考标注底图</title>
+  <desc id="map-description">固定 WGS84 范围中的 OpenStreetMap 校界和 85 个 Overture 建筑轮廓。水体、道路与地名仅为旧导览图低置信度示意。</desc>
+  <metadata>{&quot;schemaVersion&quot;:1,&quot;generatedBy&quot;:&quot;scripts/generate-precise-basemap.mjs&quot;,&quot;sourceSnapshotDate&quot;:&quot;2026-08-30&quot;,&quot;width&quot;:2038,&quot;height&quot;:1279,&quot;crs&quot;:&quot;EPSG:4326&quot;,&quot;projection&quot;:&quot;linear longitude/latitude to fixed SVG viewport&quot;,&quot;extent&quot;:{&quot;west&quot;:120.1459,&quot;east&quot;:120.16115,&quot;north&quot;:31.90918,&quot;south&quot;:31.90105},&quot;authoritativeLayers&quot;:{&quot;boundary&quot;:&quot;OpenStreetMap way 1314812014, ODbL-1.0&quot;,&quot;buildings&quot;:&quot;Overture Maps buildings theme; East Asian Buildings upstream&quot;},&quot;schematicLayer&quot;:{&quot;source&quot;:&quot;user-supplied legacy campus guide map&quot;,&quot;confidence&quot;:&quot;low&quot;,&quot;measured&quot;:false,&quot;baiduGeometryUsed&quot;:false}}</metadata>
+  <defs>
+    <clipPath id="campus-clip"><path d="M1151.46 1121.07 L1814.66 1100.98 L1850.5 743.22 L1854.74 299.79 L1395.25 316.15 L1202.37 310.52 L886.6 281.44 L546.41 213.51 L339.34 162.2 L325 212.22 L182.55 181.28 L162.25 176.87 L150.6 295.63 L149.3 511.46 L156.17 639.7 L177.29 690.44 L178.34 749.72 L169.28 776.48 L221.41 1156.89 L319.14 1153.68 L363.21 1154.94 L777.71 1139.4 L945.48 1128.21 L964.74 1107.08 L1125.72 1101.61 L1151.46 1121.07 Z"/></clipPath>
+    <style>
+      .wgs-grid line { stroke: #dedfdc; stroke-width: 1; }
+      .wgs-grid text { fill: #8a8c89; font: 13px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+      .campus-ground { fill: #f0f1ed; }
+      .legacy-waterbody { fill: #dce3e3; stroke: #aebabb; stroke-width: 2; stroke-dasharray: 8 7; }
+      .legacy-waterway { fill: none; stroke: #c6d0d0; stroke-width: 19; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 11 8; opacity: .72; }
+      .legacy-circulation { fill: none; stroke: #c8c9c5; stroke-width: 13; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 13 9; opacity: .58; }
+      .building { fill: #d4d5d1; stroke: #969995; stroke-width: 2.2; vector-effect: non-scaling-stroke; }
+      .campus-boundary { fill: none; stroke: #616460; stroke-width: 4; vector-effect: non-scaling-stroke; }
+      .legacy-label circle { fill: #f7f7f4; stroke: #696c68; stroke-width: 2; }
+      .legacy-label text { fill: #50534f; text-anchor: middle; dominant-baseline: middle; paint-order: stroke; stroke: #f7f7f4; stroke-width: 7; stroke-linejoin: round; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; }
+      .legacy-label-building text { font-size: 23px; font-weight: 620; }
+      .legacy-label-gate text { font-size: 21px; font-weight: 650; }
+      .map-note { fill: #656864; font: 15px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; }
+      #scale-bar line { stroke: #555854; stroke-width: 3; }
+      #scale-bar text { fill: #555854; text-anchor: middle; font: 16px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+      #north-arrow path { fill: #555854; }
+      #north-arrow text { fill: #555854; text-anchor: middle; font: 700 18px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    </style>
+  </defs>
+  <rect width="2038" height="1279" fill="#f7f7f4"/>
+  <g id="wgs84-grid" class="wgs-grid" aria-label="WGS84 coordinate grid">
+      <line x1="13.36" y1="0" x2="13.36" y2="1279"/>
+      <text x="18.36" y="22">120.146°E</text>
+      <line x1="147" y1="0" x2="147" y2="1279"/>
+      <line x1="280.64" y1="0" x2="280.64" y2="1279"/>
+      <text x="285.64" y="22">120.148°E</text>
+      <line x1="414.28" y1="0" x2="414.28" y2="1279"/>
+      <line x1="547.92" y1="0" x2="547.92" y2="1279"/>
+      <text x="552.92" y="22">120.150°E</text>
+      <line x1="681.56" y1="0" x2="681.56" y2="1279"/>
+      <line x1="815.2" y1="0" x2="815.2" y2="1279"/>
+      <text x="820.2" y="22">120.152°E</text>
+      <line x1="948.84" y1="0" x2="948.84" y2="1279"/>
+      <line x1="1082.48" y1="0" x2="1082.48" y2="1279"/>
+      <text x="1087.48" y="22">120.154°E</text>
+      <line x1="1216.12" y1="0" x2="1216.12" y2="1279"/>
+      <line x1="1349.76" y1="0" x2="1349.76" y2="1279"/>
+      <text x="1354.76" y="22">120.156°E</text>
+      <line x1="1483.4" y1="0" x2="1483.4" y2="1279"/>
+      <line x1="1617.04" y1="0" x2="1617.04" y2="1279"/>
+      <text x="1622.04" y="22">120.158°E</text>
+      <line x1="1750.68" y1="0" x2="1750.68" y2="1279"/>
+      <line x1="1884.31" y1="0" x2="1884.31" y2="1279"/>
+      <text x="1889.31" y="22">120.160°E</text>
+      <line x1="2017.95" y1="0" x2="2017.95" y2="1279"/>
+      <line x1="0" y1="1129.55" x2="2038" y2="1129.55"/>
+      <text x="8" y="1123.55">31.902°N</text>
+      <line x1="0" y1="972.23" x2="2038" y2="972.23"/>
+      <line x1="0" y1="814.91" x2="2038" y2="814.91"/>
+      <text x="8" y="808.91">31.904°N</text>
+      <line x1="0" y1="657.59" x2="2038" y2="657.59"/>
+      <line x1="0" y1="500.27" x2="2038" y2="500.27"/>
+      <text x="8" y="494.27">31.906°N</text>
+      <line x1="0" y1="342.95" x2="2038" y2="342.95"/>
+      <line x1="0" y1="185.64" x2="2038" y2="185.64"/>
+      <text x="8" y="179.64">31.908°N</text>
+      <line x1="0" y1="28.32" x2="2038" y2="28.32"/>
+  </g>
+  <path id="campus-ground" class="campus-ground" d="M1151.46 1121.07 L1814.66 1100.98 L1850.5 743.22 L1854.74 299.79 L1395.25 316.15 L1202.37 310.52 L886.6 281.44 L546.41 213.51 L339.34 162.2 L325 212.22 L182.55 181.28 L162.25 176.87 L150.6 295.63 L149.3 511.46 L156.17 639.7 L177.29 690.44 L178.34 749.72 L169.28 776.48 L221.41 1156.89 L319.14 1153.68 L363.21 1154.94 L777.71 1139.4 L945.48 1128.21 L964.74 1107.08 L1125.72 1101.61 L1151.46 1121.07 Z"/>
+  <g id="legacy-schematic-layer" clip-path="url(#campus-clip)" data-source="legacy-guide" data-confidence="low" data-measured="false" aria-label="旧导览图低置信度示意层">
+    <g id="legacy-water"><path id="legacy-east-west-waterway" data-source="legacy-guide" data-confidence="low" class="legacy-waterway" d="M343.27 705.41 L517.2 682.88 L678.42 637.68 L849.75 600.74 L1028 587.77 L1194.54 573.82 L1373.74 539.14 L1565.04 513.87 L1746.9 494.81 L1859.17 484.28"/>
+      <path id="legacy-central-lake" data-source="legacy-guide" data-confidence="low" class="legacy-waterbody" d="M674.89 730.55 L730.3 666.85 L833.04 617.93 L929.82 608.89 L993.24 635.43 L1047.41 629.59 L1127.72 600.37 L1202.85 627.9 L1254.66 698.04 L1265.28 802.7 L1235.18 867.14 L1142.28 876.11 L1067.3 894.38 L981.06 879.12 L879.91 835.2 L787.47 811.62 L729.38 774.13 L674.89 730.55 Z"/></g>
+    <g id="legacy-primary-circulation"><path id="legacy-north-axis" data-source="legacy-guide" data-confidence="low" class="legacy-circulation" d="M1017.47 357.76 L1023.44 445.64 L1029.46 534.71 L1026.99 608.28"/>
+      <path id="legacy-south-axis" data-source="legacy-guide" data-confidence="low" class="legacy-circulation" d="M1031.95 716.66 L1037.4 835.88 L1044.64 951.45 L1051.69 1105.59"/>
+      <path id="legacy-west-central-approach" data-source="legacy-guide" data-confidence="low" class="legacy-circulation" d="M199.98 717.72 L376.62 712.01 L536.34 676.49 L671.55 614.91 L784.49 576.65 L906.97 576.77"/>
+      <path id="legacy-east-central-approach" data-source="legacy-guide" data-confidence="low" class="legacy-circulation" d="M1141.88 569.98 L1311.92 547.52 L1493.45 521.23 L1667.54 502.32 L1837.81 484.68"/>
+      <path id="legacy-lake-west-loop" data-source="legacy-guide" data-confidence="low" class="legacy-circulation" d="M895.08 614.36 L818.32 636.28 L773.97 686.52 L779.66 768.37 L838.46 821.51 L933.24 853.49"/>
+      <path id="legacy-lake-east-loop" data-source="legacy-guide" data-confidence="low" class="legacy-circulation" d="M1133.71 603.88 L1197.46 637.64 L1223.69 701.03 L1227.54 785.33 L1183.85 850.02 L1122.69 872.86"/></g>
+  </g>
+  <g id="overture-buildings" clip-path="url(#campus-clip)" aria-label="Overture building footprints">
+    <path id="building-1" data-overture-id="0333a423-63f5-4a1d-a8ba-fde9aa2847e5" class="building" fill-rule="evenodd" d="M276.61 991.56 L297.4 990.97 L297.05 979.04 L276.27 979.64 L276.61 991.56 Z"><title>Overture building 0333a423-63f5-4a1d-a8ba-fde9aa2847e5</title></path>
+    <path id="building-2" data-overture-id="06018b00-a544-49ef-aa73-bd6505a2c727" class="building" fill-rule="evenodd" d="M706.59 1092.12 L708.03 1071.28 L657.67 1067.75 L656.22 1088.58 L706.59 1092.12 Z"><title>Overture building 06018b00-a544-49ef-aa73-bd6505a2c727</title></path>
+    <path id="building-3" data-overture-id="06c4a60a-79a7-4578-bd78-20bc433019e0" class="building" fill-rule="evenodd" d="M1372.93 938.11 L1372.74 975.41 L1377.19 975.42 L1377.39 938.14 L1372.93 938.11 Z"><title>Overture building 06c4a60a-79a7-4578-bd78-20bc433019e0</title></path>
+    <path id="building-4" data-overture-id="0c8b3eb1-1580-4f12-af01-9adf3d6e6a5d" class="building" fill-rule="evenodd" d="M1817.52 514.89 L1817.05 498.48 L1788.84 499.3 L1789.31 515.69 L1817.52 514.89 Z"><title>Overture building 0c8b3eb1-1580-4f12-af01-9adf3d6e6a5d</title></path>
+    <path id="building-5" data-overture-id="1188b0d5-ccc5-4074-8c24-a134cd86903b" class="building" fill-rule="evenodd" d="M1419.34 428.02 L1418.18 407.17 L1397.41 408.35 L1398.58 429.2 L1419.34 428.02 Z"><title>Overture building 1188b0d5-ccc5-4074-8c24-a134cd86903b</title></path>
+    <path id="building-6" data-overture-id="1466d60f-276c-4942-9bd7-a7a6211b74a0" class="building" fill-rule="evenodd" d="M702.29 972.29 L746.84 972.24 L746.8 927.49 L702.23 927.53 L702.29 972.29 Z"><title>Overture building 1466d60f-276c-4942-9bd7-a7a6211b74a0</title></path>
+    <path id="building-7" data-overture-id="1671289c-82cf-4cc1-b48e-ff8581e2af68" class="building" fill-rule="evenodd" d="M1569.78 995.64 L1570.3 1007.56 L1610.37 1005.8 L1609.85 993.88 L1569.78 995.64 Z"><title>Overture building 1671289c-82cf-4cc1-b48e-ff8581e2af68</title></path>
+    <path id="building-8" data-overture-id="1ed27ab5-e37e-4a56-9f4e-7b14b5012b42" class="building" fill-rule="evenodd" d="M684.53 400.31 L641.6 403.93 L642.85 418.8 L685.77 415.18 L684.53 400.31 Z"><title>Overture building 1ed27ab5-e37e-4a56-9f4e-7b14b5012b42</title></path>
+    <path id="building-9" data-overture-id="2092eef4-72c9-47fa-9387-647be033eac5" class="building" fill-rule="evenodd" d="M500.55 526.5 L355.23 535.15 L355.05 532.18 L395.09 529.79 L394.56 520.85 L338.21 524.22 L338.92 536.13 L324.1 537.01 L326.21 572.75 L370.69 570.09 L371.48 583.49 L475.27 577.31 L474.93 571.35 L503.1 569.67 L500.55 526.5 Z"><title>Overture building 2092eef4-72c9-47fa-9387-647be033eac5</title></path>
+    <path id="building-10" data-overture-id="216c4956-a983-4012-816d-67ee70e9f4c1" class="building" fill-rule="evenodd" d="M1437.22 962.66 L1388.22 963.77 L1388.49 975.69 L1437.49 974.59 L1437.22 962.66 Z"><title>Overture building 216c4956-a983-4012-816d-67ee70e9f4c1</title></path>
+    <path id="building-11" data-overture-id="21c92d6d-6bbb-4aa4-9e91-9c3302221dc6" class="building" fill-rule="evenodd" d="M680.45 767.12 L619.74 772.04 L622.14 801.77 L682.84 796.85 L680.45 767.12 Z"><title>Overture building 21c92d6d-6bbb-4aa4-9e91-9c3302221dc6</title></path>
+    <path id="building-12" data-overture-id="27656656-da5f-4608-9b50-f6cda307d599" class="building" fill-rule="evenodd" d="M1443.44 1037.28 L1391.47 1038.77 L1391.81 1050.7 L1443.77 1049.22 L1443.44 1037.28 Z"><title>Overture building 27656656-da5f-4608-9b50-f6cda307d599</title></path>
+    <path id="building-13" data-overture-id="281da966-17d0-4659-b021-e80f74e8750b" class="building" fill-rule="evenodd" d="M1568.32 918.83 L1568.7 930.76 L1611.74 929.39 L1611.37 917.47 L1568.32 918.83 Z"><title>Overture building 281da966-17d0-4659-b021-e80f74e8750b</title></path>
+    <path id="building-14" data-overture-id="293cee35-ed53-43f3-8dd1-1ed89b27c448" class="building" fill-rule="evenodd" d="M251.14 995.23 L255.49 988.01 L235.73 975.97 L231.37 983.19 L251.14 995.23 Z"><title>Overture building 293cee35-ed53-43f3-8dd1-1ed89b27c448</title></path>
+    <path id="building-15" data-overture-id="2e22398f-8039-469e-ae9d-1111d2cc9b75" class="building" fill-rule="evenodd" d="M1610.81 1009.59 L1570.73 1010.74 L1571.06 1022.67 L1611.14 1021.52 L1610.81 1009.59 Z"><title>Overture building 2e22398f-8039-469e-ae9d-1111d2cc9b75</title></path>
+    <path id="building-16" data-overture-id="2fb6a514-bac4-4bb5-9e45-f9a779b0f96c" class="building" fill-rule="evenodd" d="M1446.66 950.61 L1495.66 949.51 L1495.4 937.57 L1446.39 938.67 L1446.66 950.61 Z"><title>Overture building 2fb6a514-bac4-4bb5-9e45-f9a779b0f96c</title></path>
+    <path id="building-17" data-overture-id="32bf15a7-e7bf-4535-8f7d-edb93a2ad82e" class="building" fill-rule="evenodd" d="M637.09 416.42 L635.39 401.6 L577.84 408.24 L579.54 423.06 L637.09 416.42 Z"><title>Overture building 32bf15a7-e7bf-4535-8f7d-edb93a2ad82e</title></path>
+    <path id="building-18" data-overture-id="3684193d-5d42-4f0a-83d8-8438ba768353" class="building" fill-rule="evenodd" d="M1096.89 404.78 L1096.35 351.09 L1078.52 351.28 L1079.07 404.97 L1096.89 404.78 Z"><title>Overture building 3684193d-5d42-4f0a-83d8-8438ba768353</title></path>
+    <path id="building-19" data-overture-id="36921a17-b495-4347-ba54-5dcaab1374b9" class="building" fill-rule="evenodd" d="M902.07 892.63 L903.6 858.35 L878.38 857.21 L877.52 876.58 L862.68 875.9 L862 890.8 L902.07 892.63 Z"><title>Overture building 36921a17-b495-4347-ba54-5dcaab1374b9</title></path>
+    <path id="building-20" data-overture-id="36e7a6e9-e85a-4231-ba35-a06c6613144c" class="building" fill-rule="evenodd" d="M313.1 992.11 L324.93 990.97 L323.22 973.16 L311.39 974.31 L313.1 992.11 Z"><title>Overture building 36e7a6e9-e85a-4231-ba35-a06c6613144c</title></path>
+    <path id="building-21" data-overture-id="3847759c-ae63-4dc9-96ad-ba66422f0d8e" class="building" fill-rule="evenodd" d="M383.96 1055.92 L363.21 1057.17 L364.97 1086.95 L385.72 1085.7 L383.96 1055.92 Z"><title>Overture building 3847759c-ae63-4dc9-96ad-ba66422f0d8e</title></path>
+    <path id="building-22" data-overture-id="386bfba1-2953-418c-8039-a3f130eff25d" class="building" fill-rule="evenodd" d="M855.05 967.35 L866.92 966.75 L865.66 941.43 L822.64 943.6 L824.5 980.83 L855.65 979.26 L855.05 967.35 Z"><title>Overture building 386bfba1-2953-418c-8039-a3f130eff25d</title></path>
+    <path id="building-23" data-overture-id="3b49633e-0779-427a-ad36-3a755cbe48a1" class="building" fill-rule="evenodd" d="M1440.19 1015.74 L1391.2 1017.3 L1391.39 1023.26 L1440.38 1021.71 L1440.19 1015.74 Z"><title>Overture building 3b49633e-0779-427a-ad36-3a755cbe48a1</title></path>
+    <path id="building-24" data-overture-id="3b840029-651b-46cd-99ef-7939b4d55552" class="building" fill-rule="evenodd" d="M1317.87 408.51 L1315.04 357.87 L1243.85 361.9 L1246.68 412.52 L1317.87 408.51 Z"><title>Overture building 3b840029-651b-46cd-99ef-7939b4d55552</title></path>
+    <path id="building-25" data-overture-id="3bd81570-64a3-438f-bd95-1d9254851821" class="building" fill-rule="evenodd" d="M1278.7 440.59 L1246.08 442.63 L1247.38 463.48 L1280 461.43 L1278.7 440.59 Z"><title>Overture building 3bd81570-64a3-438f-bd95-1d9254851821</title></path>
+    <path id="building-26" data-overture-id="3c192e3a-6d81-4be1-a245-975b58a3c00f" class="building" fill-rule="evenodd" d="M835.09 836.67 L833.79 806.87 L737.34 811.12 L738.64 840.93 L835.09 836.67 Z"><title>Overture building 3c192e3a-6d81-4be1-a245-975b58a3c00f</title></path>
+    <path id="building-27" data-overture-id="3c51ffd0-4724-4134-8d0a-2c09a07e48dc" class="building" fill-rule="evenodd" d="M1239.34 623.93 L1245.51 615.4 L1237.01 609.2 L1230.85 617.73 L1239.34 623.93 Z"><title>Overture building 3c51ffd0-4724-4134-8d0a-2c09a07e48dc</title></path>
+    <path id="building-28" data-overture-id="41b135fa-8ba5-461d-8cdb-dcd596a55703" class="building" fill-rule="evenodd" d="M1494.03 1022.84 L1493.97 1013.89 L1449.41 1014.2 L1449.48 1023.15 L1494.03 1022.84 Z"><title>Overture building 41b135fa-8ba5-461d-8cdb-dcd596a55703</title></path>
+    <path id="building-29" data-overture-id="43acd53f-21fe-46fb-9f34-bf0ac9375c22" class="building" fill-rule="evenodd" d="M984.45 654.63 L984.36 647.18 L1005.15 646.91 L1005.25 654.37 L1029.01 654.04 L1028.72 631.67 L939.6 632.86 L939.9 655.23 L984.45 654.63 Z"><title>Overture building 43acd53f-21fe-46fb-9f34-bf0ac9375c22</title></path>
+    <path id="building-30" data-overture-id="466778a9-c960-432b-a606-c05c0a47c3d1" class="building" fill-rule="evenodd" d="M1819.97 592.97 L1819.13 578.07 L1774.64 580.58 L1775.48 595.47 L1819.97 592.97 Z"><title>Overture building 466778a9-c960-432b-a606-c05c0a47c3d1</title></path>
+    <path id="building-31" data-overture-id="4cf740c5-4031-4ca4-8218-869a2c1187a7" class="building" fill-rule="evenodd" d="M682.12 459.42 L579.75 464.58 L580.5 479.48 L682.86 474.32 L682.12 459.42 Z"><title>Overture building 4cf740c5-4031-4ca4-8218-869a2c1187a7</title></path>
+    <path id="building-32" data-overture-id="4e3d4fdd-492f-4efd-b18a-6eabc7eefff2" class="building" fill-rule="evenodd" d="M570.61 474.19 L570.51 448.85 L558.63 448.89 L558.73 474.24 L570.61 474.19 Z"><title>Overture building 4e3d4fdd-492f-4efd-b18a-6eabc7eefff2</title></path>
+    <path id="building-33" data-overture-id="5148a63b-8b4b-4091-8966-e93bab7f9c92" class="building" fill-rule="evenodd" d="M299.53 1073.64 L292.2 1074.91 L292.7 1077.84 L300.02 1076.58 L299.53 1073.64 Z"><title>Overture building 5148a63b-8b4b-4091-8966-e93bab7f9c92</title></path>
+    <path id="building-34" data-overture-id="53842f71-6c54-42ab-8a66-e038f0c61b4b" class="building" fill-rule="evenodd" d="M878.46 1067.89 L884.65 1069.11 L886.26 1060.83 L878.01 1059.21 L876.81 1065.42 L847.94 1059.78 L844.32 1078.42 L875.26 1084.46 L878.46 1067.89 Z"><title>Overture building 53842f71-6c54-42ab-8a66-e038f0c61b4b</title></path>
+    <path id="building-35" data-overture-id="56d04df7-a830-448b-99e0-8ee79a405cfb" class="building" fill-rule="evenodd" d="M1727.73 395.97 L1647.59 399.24 L1648.19 414.16 L1747.63 410.08 L1746.05 371.33 L1726.75 372.12 L1727.73 395.97 Z"><title>Overture building 56d04df7-a830-448b-99e0-8ee79a405cfb</title></path>
+    <path id="building-36" data-overture-id="5fde02e9-8c2b-4206-bbe9-c40dc12e5d56" class="building" fill-rule="evenodd" d="M1450.91 1011.86 L1493.97 1010.61 L1493.62 998.69 L1450.57 999.93 L1450.91 1011.86 Z"><title>Overture building 5fde02e9-8c2b-4206-bbe9-c40dc12e5d56</title></path>
+    <path id="building-37" data-overture-id="61882a6f-c2ef-4a86-98af-9f50bbd1cafe" class="building" fill-rule="evenodd" d="M630.79 1022.3 L630.56 1004.4 L591.94 1004.92 L592.18 1022.82 L630.79 1022.3 Z"><title>Overture building 61882a6f-c2ef-4a86-98af-9f50bbd1cafe</title></path>
+    <path id="building-38" data-overture-id="63711e1f-c28d-44bc-a0ee-7e45e61cf4c1" class="building" fill-rule="evenodd" d="M527.49 976.24 L537.88 976.48 L538.97 930.26 L510.76 929.6 L509.46 984.77 L527.27 985.19 L527.49 976.24 Z"><title>Overture building 63711e1f-c28d-44bc-a0ee-7e45e61cf4c1</title></path>
+    <path id="building-39" data-overture-id="645ee4d2-47c6-4c83-8780-407b2cf073bf" class="building" fill-rule="evenodd" d="M211.78 808.95 L235.54 808.13 L233.88 760.42 L210.13 761.25 L211.78 808.95 Z"><title>Overture building 645ee4d2-47c6-4c83-8780-407b2cf073bf</title></path>
+    <path id="building-40" data-overture-id="64df3732-b801-4976-afce-24ad32279065" class="building" fill-rule="evenodd" d="M1558.36 919.4 L1507.89 921.48 L1508.37 933.4 L1558.84 931.33 L1558.36 919.4 Z"><title>Overture building 64df3732-b801-4976-afce-24ad32279065</title></path>
+    <path id="building-41" data-overture-id="699f80c4-5f04-44d4-b210-2704a2b2b703" class="building" fill-rule="evenodd" d="M1476.22 409.08 L1477.45 414.91 L1442.58 422.35 L1445.06 434.03 L1514.79 419.13 L1511.09 401.62 L1476.22 409.08 Z"><title>Overture building 699f80c4-5f04-44d4-b210-2704a2b2b703</title></path>
+    <path id="building-42" data-overture-id="6a0546ad-d8d2-4041-99c3-993cff8d1587" class="building" fill-rule="evenodd" d="M581.17 774.37 L586.48 823.31 L613.04 820.4 L607.75 771.47 L581.17 774.37 Z"><title>Overture building 6a0546ad-d8d2-4041-99c3-993cff8d1587</title></path>
+    <path id="building-43" data-overture-id="6b8dc28c-ab18-4eec-a401-32ef509dc4df" class="building" fill-rule="evenodd" d="M1647.29 382.55 L1672.5 381.14 L1671.25 358.8 L1745.4 354.61 L1744.49 338.22 L1645.13 343.84 L1647.29 382.55 Z"><title>Overture building 6b8dc28c-ab18-4eec-a401-32ef509dc4df</title></path>
+    <path id="building-44" data-overture-id="71d22af3-4d88-4120-911e-2026db2226f1" class="building" fill-rule="evenodd" d="M1613.78 402.36 L1614.03 411.29 L1619.96 411.14 L1619.33 388.77 L1611.9 388.99 L1612.2 399.42 L1545.39 401.34 L1545.82 416.23 L1611.14 414.36 L1610.81 402.44 L1613.78 402.36 Z"><title>Overture building 71d22af3-4d88-4120-911e-2026db2226f1</title></path>
+    <path id="building-45" data-overture-id="71d83bba-51f2-42a6-9e91-aa0f4dc12d0f" class="building" fill-rule="evenodd" d="M943.52 423.75 L894.61 426.82 L895.25 437.24 L910.07 436.31 L911.83 464.59 L920.72 464.04 L920.82 465.52 L876.34 468.31 L878.01 495.11 L916.55 492.69 L916.1 485.25 L927.95 484.51 L926.84 466.64 L946.11 465.44 L943.52 423.75 Z"><title>Overture building 71d83bba-51f2-42a6-9e91-aa0f4dc12d0f</title></path>
+    <path id="building-46" data-overture-id="771d4538-5ad1-413f-b873-f3d2a07a4bae" class="building" fill-rule="evenodd" d="M720.36 1021.03 L720.01 1003.14 L641.3 1004.67 L641.64 1022.57 L720.36 1021.03 Z"><title>Overture building 771d4538-5ad1-413f-b873-f3d2a07a4bae</title></path>
+    <path id="building-47" data-overture-id="77918e25-f5a7-4a5a-b483-d9c8d1cef943" class="building" fill-rule="evenodd" d="M243.5 774.59 L299.94 773.66 L299.7 758.75 L243.26 759.68 L243.5 774.59 Z"><title>Overture building 77918e25-f5a7-4a5a-b483-d9c8d1cef943</title></path>
+    <path id="building-48" data-overture-id="81178a7f-89b9-46ae-bc47-a8682461185e" class="building" fill-rule="evenodd" d="M1288.39 461.24 L1332.89 458.87 L1330.69 417.16 L1286.19 419.54 L1288.39 461.24 Z"><title>Overture building 81178a7f-89b9-46ae-bc47-a8682461185e</title></path>
+    <path id="building-49" data-overture-id="81bda1a9-236a-4681-b5b9-962657a949be" class="building" fill-rule="evenodd" d="M1446.49 923.6 L1446.82 935.54 L1495.81 934.13 L1495.48 922.2 L1446.49 923.6 Z"><title>Overture building 81bda1a9-236a-4681-b5b9-962657a949be</title></path>
+    <path id="building-50" data-overture-id="83f1b861-ddba-4668-9cbb-395e30fab349" class="building" fill-rule="evenodd" d="M1523.56 1009.92 L1562.16 1009.17 L1561.94 997.24 L1515.9 998.12 L1516.39 1023.48 L1562.42 1022.59 L1562.22 1012.14 L1523.61 1012.9 L1523.56 1009.92 Z"><title>Overture building 83f1b861-ddba-4668-9cbb-395e30fab349</title></path>
+    <path id="building-51" data-overture-id="84644bee-4ea0-41a6-8ce7-21d4d451c46a" class="building" fill-rule="evenodd" d="M1217.8 572.39 L1208.11 580.47 L1221.54 596.69 L1231.23 588.59 L1217.8 572.39 Z"><title>Overture building 84644bee-4ea0-41a6-8ce7-21d4d451c46a</title></path>
+    <path id="building-52" data-overture-id="847578cd-830a-4f5e-b3ee-1a553048fa7c" class="building" fill-rule="evenodd" d="M263.59 814.8 L253.21 815.16 L254.65 856.91 L259.1 856.76 L258.95 852.27 L270.82 851.86 L271.49 871.25 L249.22 872.02 L249.75 886.93 L309.12 884.85 L306.6 811.81 L269.48 813.1 L269.99 828.01 L264.06 828.22 L263.59 814.8 Z"><title>Overture building 847578cd-830a-4f5e-b3ee-1a553048fa7c</title></path>
+    <path id="building-53" data-overture-id="85a35f7e-42dd-4dfe-ad87-a9440ba43777" class="building" fill-rule="evenodd" d="M568.23 363.44 L678.11 360.62 L677.74 345.71 L567.85 348.52 L568.23 363.44 Z"><title>Overture building 85a35f7e-42dd-4dfe-ad87-a9440ba43777</title></path>
+    <path id="building-54" data-overture-id="89f47aa7-4c27-422d-b8ba-79bb27f9b4ba" class="building" fill-rule="evenodd" d="M384.4 1032.4 L384.6 1044.34 L387.57 1044.3 L387.37 1032.36 L384.4 1032.4 Z"><title>Overture building 89f47aa7-4c27-422d-b8ba-79bb27f9b4ba</title></path>
+    <path id="building-55" data-overture-id="8a8c1b0b-52f2-44cd-acf0-f9f931cbc6bc" class="building" fill-rule="evenodd" d="M1387.63 978.85 L1387.82 990.79 L1438.31 989.96 L1438.12 978.03 L1387.63 978.85 Z"><title>Overture building 8a8c1b0b-52f2-44cd-acf0-f9f931cbc6bc</title></path>
+    <path id="building-56" data-overture-id="8eaf65d4-397c-40ec-bff3-530a1ce8b05c" class="building" fill-rule="evenodd" d="M1436.88 939.73 L1386.39 940.86 L1386.66 952.8 L1437.14 951.67 L1436.88 939.73 Z"><title>Overture building 8eaf65d4-397c-40ec-bff3-530a1ce8b05c</title></path>
+    <path id="building-57" data-overture-id="8ffa0254-1ba8-435e-a2ed-523d7878b54f" class="building" fill-rule="evenodd" d="M1153.72 469.82 L1160.14 466.06 L1154.9 457.04 L1148.48 460.8 L1153.72 469.82 Z"><title>Overture building 8ffa0254-1ba8-435e-a2ed-523d7878b54f</title></path>
+    <path id="building-58" data-overture-id="959b4b54-8d2d-428e-84cc-30b897491507" class="building" fill-rule="evenodd" d="M1278.18 653.12 L1296.85 673.13 L1306.04 664.5 L1271.59 627.54 L1248.59 649.16 L1260.07 661.48 L1269.28 652.82 L1273.58 657.45 L1278.18 653.12 Z"><title>Overture building 959b4b54-8d2d-428e-84cc-30b897491507</title></path>
+    <path id="building-59" data-overture-id="971fb5f9-cd07-4296-a9ae-b02ab175fa9f" class="building" fill-rule="evenodd" d="M663.69 542.99 L717.15 541.62 L716.88 531.17 L728.76 530.87 L728.39 515.96 L663.05 517.63 L663.69 542.99 Z"><title>Overture building 971fb5f9-cd07-4296-a9ae-b02ab175fa9f</title></path>
+    <path id="building-60" data-overture-id="a564b693-6c75-423b-9d55-44b2c25cba43" class="building" fill-rule="evenodd" d="M877.89 377.77 L906.11 377.31 L906.26 386.25 L870.62 386.85 L870.74 394.3 L875.19 394.22 L875.36 404.65 L854.57 405 L854.72 413.95 L942.33 412.52 L941.03 331.99 L899.45 332.67 L899.26 320.73 L825 321.95 L825.48 351.78 L877.46 350.93 L877.61 359.87 L898.4 359.54 L898.47 364 L892.52 364.1 L892.64 371.56 L883.74 371.71 L883.6 362.76 L877.65 362.86 L877.89 377.77 Z"><title>Overture building a564b693-6c75-423b-9d55-44b2c25cba43</title></path>
+    <path id="building-61" data-overture-id="aa9f2f0b-46da-4af6-969a-9c181e37200d" class="building" fill-rule="evenodd" d="M845.27 458.73 L848.33 442.13 L833.87 439.44 L830.81 456.04 L845.27 458.73 Z"><title>Overture building aa9f2f0b-46da-4af6-969a-9c181e37200d</title></path>
+    <path id="building-62" data-overture-id="ab74395a-7bb0-4f00-a60b-71fb4c2de5e4" class="building" fill-rule="evenodd" d="M440.18 1072.74 L455.04 1072.68 L454.87 1032.4 L393.98 1032.65 L394.04 1046.09 L440.07 1045.9 L440.18 1072.74 Z"><title>Overture building ab74395a-7bb0-4f00-a60b-71fb4c2de5e4</title></path>
+    <path id="building-63" data-overture-id="abab728b-b77d-4549-90c1-ee973453024d" class="building" fill-rule="evenodd" d="M1095.96 992.55 L1096.54 1014.93 L1170.77 1013.02 L1170.21 990.65 L1095.96 992.55 Z"><title>Overture building abab728b-b77d-4549-90c1-ee973453024d</title></path>
+    <path id="building-64" data-overture-id="abe07648-d4ff-48f0-af39-f9af6f25a571" class="building" fill-rule="evenodd" d="M1796.9 752.44 L1796.71 740.51 L1764.04 741.05 L1764.24 752.97 L1796.9 752.44 Z"><title>Overture building abe07648-d4ff-48f0-af39-f9af6f25a571</title></path>
+    <path id="building-65" data-overture-id="ae3821be-6b02-46e6-ba57-740449e999d6" class="building" fill-rule="evenodd" d="M1451.34 988.34 L1558.23 985.62 L1557.71 964.74 L1450.8 967.48 L1451.34 988.34 Z"><title>Overture building ae3821be-6b02-46e6-ba57-740449e999d6</title></path>
+    <path id="building-66" data-overture-id="b10ec6f1-2b56-45ab-b0e7-786b6f2cb20d" class="building" fill-rule="evenodd" d="M1440.67 1012.33 L1440.45 1000.4 L1389.96 1001.38 L1390.18 1013.32 L1440.67 1012.33 Z"><title>Overture building b10ec6f1-2b56-45ab-b0e7-786b6f2cb20d</title></path>
+    <path id="building-67" data-overture-id="b7a7edf9-cb2a-423c-8f1d-f0e11e75b370" class="building" fill-rule="evenodd" d="M793.98 352.35 L794.65 313.57 L729.31 312.42 L728.63 351.2 L793.98 352.35 Z"><title>Overture building b7a7edf9-cb2a-423c-8f1d-f0e11e75b370</title></path>
+    <path id="building-68" data-overture-id="bc38eeb2-78b4-4cde-aa94-d17682d55e5b" class="building" fill-rule="evenodd" d="M1567.63 934.77 L1568.15 946.7 L1611.18 944.79 L1610.66 932.87 L1567.63 934.77 Z"><title>Overture building bc38eeb2-78b4-4cde-aa94-d17682d55e5b</title></path>
+    <path id="building-69" data-overture-id="bea519fe-52d6-4d30-b7fa-9bcd080ab048" class="building" fill-rule="evenodd" d="M1049.67 930.37 L1028.89 931.22 L1032.59 1022.11 L1053.36 1021.26 L1049.67 930.37 Z"><title>Overture building bea519fe-52d6-4d30-b7fa-9bcd080ab048</title></path>
+    <path id="building-70" data-overture-id="c927220a-21a4-4f61-a509-b29597f141ab" class="building" fill-rule="evenodd" d="M1355.1 402.34 L1355.76 423.22 L1381 422.42 L1380.35 401.54 L1355.1 402.34 Z"><title>Overture building c927220a-21a4-4f61-a509-b29597f141ab</title></path>
+    <path id="building-71" data-overture-id="cb8a04b4-5937-491f-a27d-c1f37975863d" class="building" fill-rule="evenodd" d="M856.91 451.33 L871.72 452.51 L872.53 442.11 L857.72 440.93 L856.91 451.33 Z"><title>Overture building cb8a04b4-5937-491f-a27d-c1f37975863d</title></path>
+    <path id="building-72" data-overture-id="cd16fc21-65cd-4662-bf01-626b8b20a7a6" class="building" fill-rule="evenodd" d="M314.8 1053.06 L315.36 1064.98 L327.23 1064.42 L325.91 1036.12 L225.02 1040.88 L227.25 1088.55 L246.54 1087.65 L245.07 1056.36 L314.8 1053.06 Z"><title>Overture building cd16fc21-65cd-4662-bf01-626b8b20a7a6</title></path>
+    <path id="building-73" data-overture-id="cf19623f-2eb3-40eb-92d4-c8ce3411639a" class="building" fill-rule="evenodd" d="M1569.94 972.7 L1570.32 984.63 L1610.39 983.35 L1610.02 971.43 L1569.94 972.7 Z"><title>Overture building cf19623f-2eb3-40eb-92d4-c8ce3411639a</title></path>
+    <path id="building-74" data-overture-id="d1ad3bbf-6c1b-4df3-9d43-022e7cc26d16" class="building" fill-rule="evenodd" d="M938.13 999.1 L878.72 999.7 L878.81 1008.65 L871.38 1008.73 L871.32 1001.27 L819.33 1001.8 L819.54 1022.68 L960.64 1021.23 L959.8 937.71 L878.1 938.55 L878.37 965.4 L937.79 964.79 L938.13 999.1 Z"><title>Overture building d1ad3bbf-6c1b-4df3-9d43-022e7cc26d16</title></path>
+    <path id="building-75" data-overture-id="da7b4860-25e4-4280-acba-986d994f1e4f" class="building" fill-rule="evenodd" d="M1387.63 925.47 L1388.05 937.4 L1435.54 935.75 L1435.14 923.82 L1387.63 925.47 Z"><title>Overture building da7b4860-25e4-4280-acba-986d994f1e4f</title></path>
+    <path id="building-76" data-overture-id="dbf36c05-3156-4a2f-abe9-aebb2015fc62" class="building" fill-rule="evenodd" d="M1569.5 957.9 L1569.94 969.82 L1611.5 968.25 L1611.06 956.32 L1569.5 957.9 Z"><title>Overture building dbf36c05-3156-4a2f-abe9-aebb2015fc62</title></path>
+    <path id="building-77" data-overture-id="e3b57293-d773-41a5-9a9d-cb08d1261aa3" class="building" fill-rule="evenodd" d="M1508.9 948.87 L1559.34 946.63 L1558.82 934.72 L1508.37 936.94 L1508.9 948.87 Z"><title>Overture building e3b57293-d773-41a5-9a9d-cb08d1261aa3</title></path>
+    <path id="building-78" data-overture-id="f176c1a4-849d-483b-a2f5-36ad790ffc78" class="building" fill-rule="evenodd" d="M1642.51 973.19 L1639.98 922.53 L1634.05 922.83 L1636.57 973.49 L1642.51 973.19 Z"><title>Overture building f176c1a4-849d-483b-a2f5-36ad790ffc78</title></path>
+    <path id="building-79" data-overture-id="f785c2b7-5647-4ec1-9437-21418ba8ba7e" class="building" fill-rule="evenodd" d="M1199.49 603.65 L1213.14 609.15 L1218.63 595.45 L1204.99 589.94 L1199.49 603.65 Z"><title>Overture building f785c2b7-5647-4ec1-9437-21418ba8ba7e</title></path>
+    <path id="building-80" data-overture-id="f801abef-ca87-406b-b820-0fe02487534e" class="building" fill-rule="evenodd" d="M1449.45 1047.33 L1492.52 1046.64 L1492.38 1037.69 L1449.31 1038.38 L1449.45 1047.33 Z"><title>Overture building f801abef-ca87-406b-b820-0fe02487534e</title></path>
+    <path id="building-81" data-overture-id="f895a5ab-68ba-43d4-8727-b7c87e105374" class="building" fill-rule="evenodd" d="M322.32 1092.48 L243.74 1097.16 L244.63 1112.05 L323.21 1107.37 L322.32 1092.48 Z"><title>Overture building f895a5ab-68ba-43d4-8727-b7c87e105374</title></path>
+    <path id="building-82" data-overture-id="f9c3c542-1f9d-4047-8e52-77259c5556e4" class="building" fill-rule="evenodd" d="M690.71 825.8 L661.05 827.46 L662.38 851.3 L597.14 854.98 L598.89 886.25 L693.8 880.89 L690.71 825.8 Z"><title>Overture building f9c3c542-1f9d-4047-8e52-77259c5556e4</title></path>
+    <path id="building-83" data-overture-id="fe1f4f88-91c7-4766-847d-bbeaf87d6996" class="building" fill-rule="evenodd" d="M705.32 907.26 L705.4 919.2 L730.66 919.01 L730.57 907.08 L705.32 907.26 Z"><title>Overture building fe1f4f88-91c7-4766-847d-bbeaf87d6996</title></path>
+    <path id="building-84" data-overture-id="ff894474-5490-4964-97a1-a9519ae0e43b" class="building" fill-rule="evenodd" d="M239.05 822.7 L237.49 816.94 L224.59 820.5 L226.17 826.24 L239.05 822.7 Z"><title>Overture building ff894474-5490-4964-97a1-a9519ae0e43b</title></path>
+    <path id="building-85" data-overture-id="ff9c9eac-fb07-4b36-8795-145bf736dd51" class="building" fill-rule="evenodd" d="M601.62 966.8 L684.69 962.36 L683.03 931.09 L599.96 935.53 L601.62 966.8 Z"><title>Overture building ff9c9eac-fb07-4b36-8795-145bf736dd51</title></path>
+  </g>
+  <path id="osm-campus-boundary" data-osm-id="way/1314812014" class="campus-boundary" d="M1151.46 1121.07 L1814.66 1100.98 L1850.5 743.22 L1854.74 299.79 L1395.25 316.15 L1202.37 310.52 L886.6 281.44 L546.41 213.51 L339.34 162.2 L325 212.22 L182.55 181.28 L162.25 176.87 L150.6 295.63 L149.3 511.46 L156.17 639.7 L177.29 690.44 L178.34 749.72 L169.28 776.48 L221.41 1156.89 L319.14 1153.68 L363.21 1154.94 L777.71 1139.4 L945.48 1128.21 L964.74 1107.08 L1125.72 1101.61 L1151.46 1121.07 Z"/>
+  <g id="legacy-reference-labels" data-source="legacy-guide" data-confidence="low" aria-label="旧导览图低置信度地名">
+    <g id="legacy-label-north-gate" data-source="legacy-guide" data-confidence="low" class="legacy-label legacy-label-gate"><circle cx="1017.53" cy="358.97" r="5"/><text x="1017.53" y="345.97">◇ 北门</text></g>
+    <g id="legacy-label-south-gate" data-source="legacy-guide" data-confidence="low" class="legacy-label legacy-label-gate"><circle cx="1051.69" cy="1105.59" r="5"/><text x="1051.69" y="1092.59">◇ 南门</text></g>
+    <g id="legacy-label-west-gate" data-source="legacy-guide" data-confidence="low" class="legacy-label legacy-label-gate"><circle cx="201.92" cy="717.69" r="5"/><text x="201.92" y="704.69">◇ 西门</text></g>
+    <g id="legacy-label-northeast-gate" data-source="legacy-guide" data-confidence="low" class="legacy-label legacy-label-gate"><circle cx="1851.44" cy="527.81" r="5"/><text x="1851.44" y="514.81">◇ 东北门</text></g>
+    <g id="legacy-label-library" data-source="legacy-guide" data-confidence="low" class="legacy-label legacy-label-building"><text x="1036.95" y="698.49">◇ 图书馆</text></g>
+    <g id="legacy-label-gymnasium" data-source="legacy-guide" data-confidence="low" class="legacy-label legacy-label-building"><text x="284.38" y="565.49">◇ 体育馆</text></g>
+    <g id="legacy-label-training" data-source="legacy-guide" data-confidence="low" class="legacy-label legacy-label-building"><text x="459.35" y="565.84">◇ 工程训练中心</text></g>
+    <g id="legacy-label-exchange" data-source="legacy-guide" data-confidence="low" class="legacy-label legacy-label-building"><text x="312.04" y="830.13">◇ 国际学术交流中心</text></g>
+  </g>
+  <g id="north-arrow" transform="translate(1983 56)" aria-label="North arrow">
+    <text x="0" y="-17">N</text>
+    <path d="M0 -8 L-10 18 L0 13 L10 18 Z"/>
+  </g>
+  <g id="scale-bar" aria-label="200 metre scale bar">
+    <line x1="1707.17" y1="1215" x2="1990" y2="1215"/>
+    <line x1="1707.17" y1="1208" x2="1707.17" y2="1222"/>
+    <line x1="1990" y1="1208" x2="1990" y2="1222"/>
+    <text x="1848.59" y="1203">200 m</text>
+  </g>
+  <text class="map-note" x="34" y="1232">◇ / 虚线：旧导览图低置信度示意，非测绘；路线与入口请现场复核</text>
+  <text class="map-note" x="34" y="1256">© OpenStreetMap contributors · Overture Maps Foundation · East Asian Buildings contributors (CC BY 4.0) · 2026-08-30</text>
+</svg>

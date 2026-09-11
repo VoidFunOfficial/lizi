@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "method": "global-affine",
+  "source": {
+    "image": "map-high.jpg",
+    "width": 7500,
+    "height": 4710,
+    "sha256": "d43f22bbb45d2c5b4d2d2fd7b93a2cb9724296d2e20649800234ec2fc6a3c2d6",
+    "calibration": "LEGACY_JIANGYIN_CAMPUS_CALIBRATION",
+    "anchorCount": 12,
+    "alignmentToLegacy": {
+      "referenceImage": "map.jpg",
+      "referenceWidth": 2038,
+      "referenceHeight": 1279,
+      "featurePatchCount": 40,
+      "featurePatchMatchCount": 40,
+      "rmsResidualLegacyPixels": 0.0193,
+      "maxResidualLegacyPixels": 0.0652,
+      "statement": "The supplied high-resolution raster has the same normalized framing as the calibrated legacy guide, so the normalized WGS84 transform is reused without refitting."
+    }
+  },
+  "logicalCanvas": {
+    "width": 2038,
+    "height": 1279,
+    "coordinateSpace": "normalized SVG viewport"
+  },
+  "target": {
+    "image": "public/campus-guide-georectified-high.png",
+    "width": 7500,
+    "height": 4710,
+    "sha256": "d7ee892f3d74471b01527f4fe62b17d22afca3509e7de5da5d7f35f8ac009c14",
+    "crs": "EPSG:4326",
+    "west": 120.1459,
+    "east": 120.16115,
+    "north": 31.90918,
+    "south": 31.90105
+  },
+  "normalizedForward": {
+    "x": [0.95304918818346, 0.027032500055909, 0.009791071421222],
+    "y": [-0.028335415588065, 0.941544114138144, 0.042666112736829]
+  },
+  "pixelForward": {
+    "x": [0.95304918818346, 0.0430453822546322, 73.433035659165],
+    "y": [-0.0177946409893048, 0.941544114138144, 200.957390990465]
+  },
+  "sourceModelQuality": {
+    "fitRmsMeters": 11.376010182601021,
+    "maxErrorMeters": 18.816160486232565,
+    "leaveOneOutRmsMeters": 15.850011937718902,
+    "anchorCoverage": 0.6188731557703554,
+    "statement": "The raster is rectified to a stable north-up grid, but independent positional accuracy remains reference-grade rather than survey-grade."
+  },
+  "visualFilters": {
+    "paddingPixels": 944,
+    "paddingColor": "#eff2e9",
+    "contrast": 0.94,
+    "brightness": 0.035,
+    "saturation": 0.78,
+    "unsharp": "5:5:0.45:5:5:0"
+  }
+}
