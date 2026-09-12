@@ -33,7 +33,7 @@ jobs:
       - run: node scripts/prepare-vercel.mjs --skip-build
       - run: node scripts/test-vercel-package.mjs
       - name: Package Vercel web build
-        run: tar -czf njustmap-web.tar.gz -C outputs/vercel/njustmap .
+        run: tar -czf njustmap-web.tar.gz .vercel/output
       - uses: actions/upload-artifact@v4
         with:
           name: web

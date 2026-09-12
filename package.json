@@ -22,14 +22,14 @@
     "test:ios": "node scripts/test-ios-services.mjs",
     "start": "wrangler dev --config dist/server/wrangler.json",
     "test": "node --experimental-strip-types --test tests/*.test.ts",
-    "lint": "oxlint app api lib tests",
+    "lint": "oxlint app lib tests",
     "format": "oxfmt",
     "typecheck": "tsc --noEmit",
     "check": "pnpm test && pnpm lint && pnpm typecheck",
     "version:check": "node scripts/app-version.mjs",
     "test:release": "node --experimental-strip-types --test tests/release-version.test.ts",
     "release:version": "node scripts/bump-version.mjs",
-    "build:vercel": "NJUST_VERCEL_BUILD=1 vinext build",
+    "build:vercel": "node scripts/build-vercel.mjs",
     "vercel:package": "node scripts/prepare-vercel.mjs"
   },
   "dependencies": {

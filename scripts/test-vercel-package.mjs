@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { access, readFile } from 'node:fs/promises';
+import { createServer } from 'node:http';
 
 const output = new URL('../outputs/vercel/njustmap/', import.meta.url);
 for (const file of [
@@ -42,3 +43,40 @@ assert.equal(typeof GET, 'function');
 console.log(
   'PASS Vercel static pages, bundled API entrypoints, JW validation and origin protection',
 );
+
+const { default: nodeHandler } = await import(
+  new URL(
+    '../.vercel/output/functions/api/student/jw.func/index.cjs',
+    import.meta.url,
+  ).href
+);
+const server = createServer(nodeHandler);
+await new Promise((resolve, reject) => {
+  server.once('error', reject);
+  server.listen(0, '127.0.0.1', resolve);
+});
+try {
+  const address = server.address();
+  const url = `http://127.0.0.1:${address.port}/api/student/jw`;
+  for (const [method, body, origin, status] of [
+    ['POST', '{}', undefined, 400],
+    ['POST', '{}', 'https://other.example', 403],
+    ['POST', 'x'.repeat(24001), undefined, 413],
+    ['GET', undefined, undefined, 405],
+  ]) {
+    const response = await fetch(url, {
+      method,
+      body,
+      headers: {
+        'content-type': 'application/json',
+        ...(origin ? { origin } : {}),
+      },
+    });
+    assert.equal(response.status, status);
+    await response.arrayBuffer();
+  }
+  console.log('PASS deployed Node function HTTP adapter: 400/403/413/405');
+} finally {
+  server.closeAllConnections();
+  server.close();
+}

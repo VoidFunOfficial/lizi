@@ -59,7 +59,7 @@ Release 的 `njustmap-android.apk` 是官网使用的固定下载文件名。它
 
 ### 附件与恢复
 
-- `njustmap-web.tar.gz`：Vercel 部署包，含静态页面与 Node.js API。
+- `njustmap-web.tar.gz`：Vercel Build Output API 部署包（`.vercel/output`），含静态页面与 Node.js API，可用 `vercel deploy --prebuilt` 上传。
 - `njustmap-android.apk`：固定下载入口；另附带版本号的 debug APK，配置签名后附带 AAB。
 - `njustmap-ios-simulator.zip`：仅模拟器 App；不是可装到 iPhone 的 IPA。iPhone 签名分发见 [IOS.md](IOS.md)。
 - `BUILD-INFO.txt`、`SHA256SUMS.txt`：构建信息和全部附件校验和。
