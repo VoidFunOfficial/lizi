@@ -45,7 +45,6 @@ next-env.d.ts
 *.keystore
 *.p12
 *.mobileprovision
-.env.example
 !.env.example
 __pycache__/
 *.pyc

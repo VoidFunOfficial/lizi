@@ -20,6 +20,22 @@ PR、普通分支 push、手动 CI 都会检查 Web、Android 和 iOS。默认�
 
 Android/iOS 构建号由 `major * 1000000 + minor * 1000 + patch` 生成，例如 `0.1.0 → 1000`。minor/patch 上限为 999，只支持稳定版本，确保升级时构建号递增。`pnpm version:check` 验证版本；`node scripts/app-version.mjs v0.1.0` 额外验证标签。iOS CLI 将版本传入 Xcode；直接使用 Xcode 时请手动同步其版本设置。
 
+## 当前启用：标签自动发布
+
+按仓库所有者要求，Actions 创建/批准 PR 权限保持关闭。默认分支 push 执行三端 CI；推送版本标签时自动创建 Release 并上传附件。不会创建、批准或合并任何 PR。
+
+发布步骤：
+
+1. 运行 `pnpm release:version patch`（也可使用 `minor` 或 `major`），同时更新 package.json 与版本 manifest。
+2. 执行 `pnpm check`，提交版本变更并推送 main。
+3. 为该提交创建与 package.json 相同版本的标签，例如 `git tag v0.1.1`，然后 `git push origin v0.1.1`。
+
+标签和包版本不一致时发布失败。无需手工修改 Android/iOS 构建号。
+
+## 可选：开启自动版本 PR
+
+上方描述的 Release Please 流程需要设置仓库变量 `ENABLE_RELEASE_PLEASE=true`，再开启下方权限。默认未启用，不影响标签自动发布。
+
 ## GitHub 一次性设置
 
 在 Settings → Actions → General 开启 **Allow GitHub Actions to create and approve pull requests**。工作流已声明所需的最小任务权限。
