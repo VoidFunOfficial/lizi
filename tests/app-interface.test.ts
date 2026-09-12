@@ -75,7 +75,7 @@ void test('/debug_sunshine reuses the physical shadow model with a full-day time
 
   assert.match(source, /createBuildingShadowPolygons/);
   assert.match(source, /solarPositionAt/);
-  assert.match(source, /NJUST_SOLAR_BUILDINGS/);
+  assert.match(source, /CAMPUS_MAP_STORAGE_KEY/);
   assert.match(source, /type="range"/);
   assert.match(source, /max="1439"/);
   assert.match(source, /强制晴天/);

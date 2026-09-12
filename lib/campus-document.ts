@@ -22,6 +22,8 @@ import {
   type WeeklySchedule,
 } from './campus-model.ts';
 
+export const CAMPUS_MAP_STORAGE_KEY = 'njust-campus-map-v2-guide-georectified';
+
 type UnknownRecord = Record<string, unknown>;
 
 export type GeoTransform = {
@@ -567,6 +569,37 @@ function parseV2(value: UnknownRecord): CampusMapDocument {
   if (new Set(areas.map((area) => area.id)).size !== areas.length)
     throw new Error('通行面 id 重复');
 
+  const solarBuildings = array(
+    value.solarBuildings ?? [],
+    'solarBuildings',
+  ).map((item, index) => {
+    const label = `solarBuildings[${index}]`;
+    const source = record(item, label);
+    const footprint = array(source.footprint, `${label}.footprint`).map(
+      (point, pointIndex) =>
+        mapPoint(point, `${label}.footprint[${pointIndex}]`),
+    );
+    const twiceArea = footprint.reduce((sum, point, pointIndex) => {
+      const next = footprint[(pointIndex + 1) % footprint.length];
+      return sum + point.x * next.y - next.x * point.y;
+    }, 0);
+    if (footprint.length < 4 || Math.abs(twiceArea) < 1e-12)
+      throw new Error(`${label}.footprint 必须是有效的建筑轮廓`);
+    const heightMeters = finite(source.heightMeters, `${label}.heightMeters`);
+    if (heightMeters <= 0) throw new Error(`${label}.heightMeters 必须大于 0`);
+    return {
+      id: text(source.id, `${label}.id`),
+      name: text(source.name, `${label}.name`),
+      heightMeters,
+      footprint,
+    };
+  });
+  if (
+    new Set(solarBuildings.map((building) => building.id)).size !==
+    solarBuildings.length
+  )
+    throw new Error('阴影建筑 id 重复');
+
   const metersPerPixel = optionalFinite(
     map.metersPerPixel,
     'map.metersPerPixel',
@@ -589,6 +622,7 @@ function parseV2(value: UnknownRecord): CampusMapDocument {
     places,
     links,
     areas,
+    solarBuildings,
     updatedAt:
       typeof value.updatedAt === 'string'
         ? value.updatedAt

@@ -2,7 +2,7 @@
 
 import { ArrowLeft, Building2, Clock3, Moon, Sun } from 'lucide-react';
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import {
   createBuildingShadowPolygons,
@@ -11,7 +11,9 @@ import {
 import { formatCampusDateTime, parseCampusDateTime } from '@/lib/campus-time';
 import { MAP_HEIGHT, MAP_WIDTH, type MapPoint } from '@/lib/campus-model';
 import { REFINED_GUIDE_IMAGE } from '@/lib/njust-jiangyin-reference';
-import { NJUST_SOLAR_BUILDINGS } from '@/lib/njust-solar-buildings';
+import type { SolarBuilding } from '@/lib/campus-model';
+import { CAMPUS_MAP_STORAGE_KEY, parseCampusMap } from '@/lib/campus-document';
+import { migrateToCurrentBasemap } from '@/lib/campus-basemap-migration';
 
 import styles from './page.module.css';
 
@@ -46,6 +48,39 @@ function shadowLengthLabel(heightMeters: number, elevationDegrees: number) {
 }
 
 export default function DebugSunshinePage() {
+  const [buildings, setBuildings] = useState<SolarBuilding[]>([]);
+  const [loadError, setLoadError] = useState('');
+  useEffect(() => {
+    const sync = () => {
+      try {
+        const saved = window.localStorage.getItem(CAMPUS_MAP_STORAGE_KEY);
+        setBuildings(
+          saved
+            ? (migrateToCurrentBasemap(parseCampusMap(saved)).solarBuildings ??
+                [])
+            : [],
+        );
+        setLoadError('');
+      } catch {
+        setLoadError('无法读取已保存的建筑，请返回地图编辑器检查数据');
+      }
+    };
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === CAMPUS_MAP_STORAGE_KEY) sync();
+    };
+    const timer = window.setTimeout(sync, 0);
+    window.addEventListener('storage', onStorage);
+    window.addEventListener('focus', sync);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener('storage', onStorage);
+      window.removeEventListener('focus', sync);
+    };
+  }, []);
+  const highestBuilding = Math.max(
+    0,
+    ...buildings.map((building) => building.heightMeters),
+  );
   const [date, setDate] = useState(() => formatCampusDateTime().slice(0, 10));
   const [minutes, setMinutes] = useState(DEFAULT_MINUTES);
   const selectedTime = timeLabel(minutes);
@@ -61,9 +96,9 @@ export default function DebugSunshinePage() {
   const shadows = useMemo(
     () =>
       position && position.elevationDegrees > 0
-        ? createBuildingShadowPolygons(position)
+        ? createBuildingShadowPolygons(position, buildings)
         : [],
-    [position],
+    [position, buildings],
   );
 
   return (
@@ -125,7 +160,7 @@ export default function DebugSunshinePage() {
             ))}
           </g>
           <g className={styles.buildings} aria-hidden="true">
-            {NJUST_SOLAR_BUILDINGS.map((building) => (
+            {buildings.map((building) => (
               <polygon
                 key={building.id}
                 points={pointsAttribute(building.footprint)}
@@ -139,7 +174,8 @@ export default function DebugSunshinePage() {
             <i className={styles.shadowSwatch} /> 投影阴影
           </span>
           <span>
-            <i className={styles.buildingSwatch} /> 27 栋长方体
+            <i className={styles.buildingSwatch} /> {buildings.length}{' '}
+            栋自定义建筑
           </span>
         </div>
       </section>
@@ -196,18 +232,31 @@ export default function DebugSunshinePage() {
             </dd>
           </div>
           <div>
-            <dt>35 m 宿舍阴影</dt>
-            <dd>{shadowLengthLabel(35, position?.elevationDegrees ?? -1)}</dd>
+            <dt>最高建筑</dt>
+            <dd>{highestBuilding ? `${highestBuilding} m` : '—'}</dd>
           </div>
           <div>
-            <dt>30 m 致字楼阴影</dt>
-            <dd>{shadowLengthLabel(30, position?.elevationDegrees ?? -1)}</dd>
+            <dt>最高建筑阴影</dt>
+            <dd>
+              {highestBuilding
+                ? shadowLengthLabel(
+                    highestBuilding,
+                    position?.elevationDegrees ?? -1,
+                  )
+                : '—'}
+            </dd>
           </div>
         </dl>
 
         <div className={styles.modelNote}>
           <Building2 />
-          <span>20 栋宿舍高 35 m · 7 栋致字楼高 30 m · 其他建筑不建模</span>
+          <span>
+            {loadError ||
+              (buildings.length
+                ? '使用地图编辑器中保存的矩形与建筑高度'
+                : '尚未添加阴影建筑，旧建筑预设已清空')}{' '}
+            · <Link href="/">添加或编辑阴影</Link>
+          </span>
         </div>
       </section>
     </main>

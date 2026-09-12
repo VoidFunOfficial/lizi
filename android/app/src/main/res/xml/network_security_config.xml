@@ -2,7 +2,6 @@
 <network-security-config>
     <base-config cleartextTrafficPermitted="false" />
     <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="false">202.119.81.112</domain>
-        <domain includeSubdomains="false">202.119.81.113</domain>
+        <domain includeSubdomains="false">bkjw.njust.edu.cn</domain>
     </domain-config>
 </network-security-config>

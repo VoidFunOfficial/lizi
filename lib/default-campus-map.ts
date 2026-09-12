@@ -17,6 +17,7 @@ const documentContent = (document: CampusMapDocument) =>
     places: document.places,
     links: document.links,
     areas: document.areas,
+    solarBuildings: document.solarBuildings ?? [],
   });
 const REFERENCE_ONLY_PLACEHOLDER_CONTENT = documentContent(
   parseCampusMap(

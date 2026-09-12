@@ -20,6 +20,9 @@ importers:
       '@capacitor/geolocation':
         specifier: 8.2.2
         version: 8.2.2(@capacitor/core@8.5.1)
+      '@capacitor/ios':
+        specifier: 8.5.1
+        version: 8.5.1(@capacitor/core@8.5.1)
       '@shadcn/react':
         specifier: 0.3.0
         version: 0.3.0(@types/react@19.2.14)(react@19.2.6)
@@ -319,6 +322,11 @@ packages:
     resolution: {integrity: sha512-X8ryw6CfL4LspJnnfVL4++DUKKZVfdUIA9JljWVRljEDIQxZQZtz6xf7qstht+ymc+le6oa5EaUChVA6KsCYlA==}
     peerDependencies:
       '@capacitor/core': '>=8.0.0'
+
+  '@capacitor/ios@8.5.1':
+    resolution: {integrity: sha512-0EVqwCYf3RUp2JAjUGZ04xmG6dSpIsPmPacI9zKxn6mu9RSiHhmFF230ghe00HrkyB6ig6SfNdoADvVODxYhlQ==}
+    peerDependencies:
+      '@capacitor/core': ^8.5.0
 
   '@capacitor/synapse@1.0.4':
     resolution: {integrity: sha512-/C1FUo8/OkKuAT4nCIu/34ny9siNHr9qtFezu4kxm6GY1wNFxrCFWjfYx5C1tUhVGz3fxBABegupkpjXvjCHrw==}
@@ -4085,6 +4093,10 @@ snapshots:
       '@capacitor/core': 8.5.1
       '@capacitor/synapse': 1.0.4
 
+  '@capacitor/ios@8.5.1(@capacitor/core@8.5.1)':
+    dependencies:
+      '@capacitor/core': 8.5.1
+
   '@capacitor/synapse@1.0.4': {}
 
   '@cloudflare/kv-asset-handler@0.5.0': {}
@@ -4470,7 +4482,7 @@ snapshots:
 
   '@jridgewell/source-map@0.3.11':
     dependencies:
-      '@jridgewell/gen-mapping': 0.3.12
+      '@jridgewell/gen-mapping': 0.3.5
       '@jridgewell/trace-mapping': 0.3.31
 
   '@jridgewell/sourcemap-codec@1.6.0': {}

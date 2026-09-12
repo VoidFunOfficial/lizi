@@ -14,6 +14,7 @@ export type FeatureSelection =
   | { type: 'node'; id: string }
   | { type: 'link'; id: string }
   | { type: 'area'; id: string }
+  | { type: 'shadow'; id: string }
   | null;
 
 export type InsertNodeResult = {
@@ -279,6 +280,14 @@ export function deleteFeature(
   document: CampusMapDocument,
   selection: Exclude<FeatureSelection, null>,
 ): CampusMapDocument {
+  if (selection.type === 'shadow') {
+    return {
+      ...document,
+      solarBuildings: (document.solarBuildings ?? []).filter(
+        (building) => building.id !== selection.id,
+      ),
+    };
+  }
   if (selection.type === 'node') {
     return {
       ...document,

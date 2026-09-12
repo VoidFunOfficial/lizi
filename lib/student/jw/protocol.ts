@@ -1,7 +1,10 @@
-// The same bounded transport is used by the Worker and the Android bridge.
-export const LOGIN_URL = 'http://202.119.81.112:8080/Logon.do?method=logon';
-export const TABLE_URL =
-  'http://202.119.81.112:9080/njlgdx/xskb/xskb_list.do?Ves632DSdyV=NEW_XSD_PYGL';
+// The same bounded transport is used by the Worker, Android and iOS bridges.
+export const LOGIN_URL =
+  'https://ids.njust.edu.cn/authserver/login?service=https%3A%2F%2Fehall2.njust.edu.cn%2Flogin';
+// Official hall teaching-service entry; issues a separate CAS ticket for bkjw.
+export const SSO_URL = 'http://bkjw.njust.edu.cn/njlgdx/indexsso.jsp';
+export const MAIN_URL = 'http://bkjw.njust.edu.cn/njlgdx/framework/main.jsp';
+export const TABLE_URL = 'http://bkjw.njust.edu.cn/njlgdx/xskb/xskb_list.do';
 export const MAX_RESPONSE = 5 * 1024 * 1024;
 export type JwRequest = {
   url: string;
@@ -23,28 +26,41 @@ export type Transport = (
 
 export function allowedUrl(raw: string): URL {
   const url = new URL(raw);
-  const login = url.origin === 'http://202.119.81.112:8080';
+  const ids = url.origin === 'https://ids.njust.edu.cn';
+  const hall = url.origin === 'https://ehall2.njust.edu.cn';
   const timetable = [
-    'http://202.119.81.112:9080',
-    'http://202.119.81.113:9080',
+    'http://bkjw.njust.edu.cn',
+    'https://bkjw.njust.edu.cn',
   ].includes(url.origin);
   const path = url.pathname;
-  const allowed = login
-    ? [
-        '/Logon.do',
-        '/verifycode.servlet',
-        '/framework/main.jsp',
-        '/framework/Main.jsp',
-      ].includes(path)
-    : timetable &&
-      [
-        '/njlgdx/xk/LoginToXk',
-        '/njlgdx/xk/Verifyservlet',
-        '/njlgdx/verifycode.servlet',
-        '/njlgdx/framework/main.jsp',
-        '/njlgdx/xskb/xskb_list.do',
-        '/njlgdx/xskb/xskb_print.do',
-      ].includes(path);
+  const allowed = ids
+    ? ['/authserver/login', '/authserver/getCaptcha.htl'].includes(path)
+    : hall
+      ? ['/login', '/', '/index.html', '/new/index.html'].includes(path)
+      : timetable &&
+        [
+          '/njlgdx/indexsso.jsp',
+          '/njlgdx/xk/LoginToXk',
+          '/njlgdx/framework/main.jsp',
+          '/njlgdx/xskb/xskb_list.do',
+          '/njlgdx/xskb/xskb_print.do',
+        ].includes(path);
+  // CAS may return to the hall or the teaching system, never an arbitrary service.
+  for (const service of url.searchParams.getAll('service')) {
+    const target = new URL(service);
+    if (
+      ![
+        'https://ehall2.njust.edu.cn/login',
+        SSO_URL,
+        SSO_URL.replace('http:', 'https:'),
+        MAIN_URL,
+        MAIN_URL.replace('http:', 'https:'),
+        'http://bkjw.njust.edu.cn/njlgdx/xk/LoginToXk',
+        'https://bkjw.njust.edu.cn/njlgdx/xk/LoginToXk',
+      ].includes(target.href)
+    )
+      throw new Error('教务系统返回了不支持的跳转，请重试。');
+  }
   if (
     !allowed ||
     url.username ||
@@ -74,9 +90,8 @@ export function validateRequest(value: unknown): JwRequest {
   if (
     r.method === 'POST' &&
     ![
-      '/Logon.do',
+      '/authserver/login',
       '/njlgdx/xk/LoginToXk',
-      '/njlgdx/xk/Verifyservlet',
       '/njlgdx/xskb/xskb_list.do',
       '/njlgdx/xskb/xskb_print.do',
     ].includes(u.pathname)
@@ -108,32 +123,69 @@ export function responseText(response: JwResponse): string {
 
 export class JwCookies {
   private values: {
-    host: string;
+    domain: string;
+    hostOnly: boolean;
     path: string;
     name: string;
     value: string;
+    secure: boolean;
+    expires: number;
   }[] = [];
-  update(url: string, headers: string[]) {
-    const host = new URL(url).hostname;
+  update(raw: string, headers: string[]) {
+    const url = new URL(raw);
+    const host = url.hostname;
     for (const header of headers) {
       const [pair, ...attributes] = header.split(';');
       const i = pair.indexOf('=');
       if (i < 1) continue;
       const name = pair.slice(0, i).trim();
       const value = pair.slice(i + 1).trim();
-      const path =
+      const attr = (key: string) =>
         attributes
-          .find((a) => /^\s*path=/i.test(a))
-          ?.split('=')
-          .slice(1)
-          .join('=')
-          .trim() || '/';
-      if (!/^[\w.-]+$/.test(name) || /[\r\n;]/.test(value)) continue;
-      this.values = this.values.filter(
-        (c) => !(c.host === host && c.path === path && c.name === name),
+          .find((a) =>
+            a
+              .trim()
+              .toLowerCase()
+              .startsWith(key + '='),
+          )
+          ?.trim()
+          .slice(key.length + 1);
+      const declared = attr('domain')?.toLowerCase().replace(/^\./, '');
+      const domain = declared || host;
+      if (
+        domain !== host &&
+        (domain !== 'njust.edu.cn' || !host.endsWith('.' + domain))
+      )
+        continue;
+      const defaultPath =
+        url.pathname.slice(0, url.pathname.lastIndexOf('/')) || '/';
+      const path = attr('path')?.startsWith('/') ? attr('path')! : defaultPath;
+      const secure = attributes.some(
+        (a) => a.trim().toLowerCase() === 'secure',
       );
-      if (!attributes.some((a) => /^\s*max-age=0\s*$/i.test(a)))
-        this.values.push({ host, path, name, value });
+      if (secure && url.protocol !== 'https:') continue;
+      if (!/^[\w.-]+$/.test(name) || /[\r\n;]/.test(value)) continue;
+      const maxAge = attr('max-age');
+      const date = Date.parse(attr('expires') || '');
+      const expires =
+        maxAge !== undefined && /^-?\d+$/.test(maxAge)
+          ? Date.now() + Number(maxAge) * 1000
+          : Number.isNaN(date)
+            ? Infinity
+            : date;
+      this.values = this.values.filter(
+        (c) => !(c.domain === domain && c.path === path && c.name === name),
+      );
+      if (expires > Date.now())
+        this.values.push({
+          domain,
+          hostOnly: !declared,
+          path,
+          name,
+          value,
+          secure,
+          expires,
+        });
     }
   }
   header(raw: string) {
@@ -141,7 +193,10 @@ export class JwCookies {
     return this.values
       .filter(
         (c) =>
-          c.host === u.hostname &&
+          c.expires > Date.now() &&
+          (c.domain === u.hostname ||
+            (!c.hostOnly && u.hostname.endsWith('.' + c.domain))) &&
+          (!c.secure || u.protocol === 'https:') &&
           (u.pathname === c.path ||
             u.pathname.startsWith(
               c.path.endsWith('/') ? c.path : c.path + '/',

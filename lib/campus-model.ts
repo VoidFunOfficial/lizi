@@ -4,6 +4,13 @@ export const CAMPUS_MAP_VERSION = 2 as const;
 
 export type MapPoint = { x: number; y: number };
 
+export type SolarBuilding = {
+  id: string;
+  name: string;
+  heightMeters: number;
+  footprint: MapPoint[];
+};
+
 export type Wgs84Point = {
   latitude: number;
   longitude: number;
@@ -190,6 +197,7 @@ export type CampusMapDocument = {
   places: Place[];
   links: TraversalLink[];
   areas: WalkableArea[];
+  solarBuildings?: SolarBuilding[];
   updatedAt: string;
 };
 

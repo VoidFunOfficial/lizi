@@ -13,6 +13,7 @@ import {
   CloudLightning,
   CloudRain,
   CloudSnow,
+  Compass,
   Crosshair,
   Download,
   Layers3,
@@ -52,8 +53,11 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { ShadowInspector } from './shadow-inspector';
 import StudentHub, { type StudentTab } from './app/student/student-hub';
 import { useNavigationSheet } from './app/use-navigation-sheet';
+import { useDeviceHeading } from './app/use-device-heading';
+import { headingLabel, headingOnMap } from '@/lib/device-heading';
 import type { PlanLeg } from '@/lib/student/planner';
 import { timeLabel } from '@/lib/student/calendar';
 import georectification from '@/data/campus-guide-georectification.json';
@@ -67,7 +71,11 @@ import {
   type FeatureSelection,
   type SnapExclusions,
 } from '@/lib/campus-editor';
-import { parseCampusMap, serializeCampusMap } from '@/lib/campus-document';
+import {
+  CAMPUS_MAP_STORAGE_KEY,
+  parseCampusMap,
+  serializeCampusMap,
+} from '@/lib/campus-document';
 import {
   createDefaultCampusMap,
   isReferenceOnlyPlaceholder,
@@ -90,7 +98,7 @@ import {
   REFINED_GUIDE_REVISION,
   applyJiangyinReference,
 } from '@/lib/njust-jiangyin-reference';
-import { NJUST_SOLAR_BUILDINGS } from '@/lib/njust-solar-buildings';
+import { rectangleFootprint } from '@/lib/njust-solar-buildings';
 import {
   parseXiaomiWeather,
   weatherAtTime,
@@ -129,6 +137,7 @@ type DrawingTool =
   | 'curve'
   | 'area'
   | 'obstacle'
+  | 'shadow'
   | 'building'
   | 'vertical'
   | 'place'
@@ -149,7 +158,7 @@ type LocationWatch =
   | { platform: 'native'; id: string }
   | { platform: 'web'; id: number };
 
-const STORAGE_KEY = 'njust-campus-map-v2-guide-georectified';
+const STORAGE_KEY = CAMPUS_MAP_STORAGE_KEY;
 const REFINED_STORAGE_KEY = 'njust-campus-map-v2-guide-refined';
 const VECTOR_STORAGE_KEY = 'njust-campus-map-v2-precision';
 const PREVIOUS_STORAGE_KEY = 'njust-campus-map-v2';
@@ -202,6 +211,12 @@ const TOOL_ITEMS: Array<{
     label: '障碍物',
     icon: SquareDashed,
     hint: '在通行面内挖出不可穿行区域',
+  },
+  {
+    id: 'shadow',
+    label: '添加阴影',
+    icon: Sun,
+    hint: '点击矩形两个对角，设置建筑高度，再保存阴影',
   },
   {
     id: 'building',
@@ -1329,6 +1344,11 @@ export default function Home({
   const [selection, setSelection] = useState<FeatureSelection>(null);
   const [activeNodeId, setActiveNodeId] = useState<string | null>(null);
   const [draftPoints, setDraftPoints] = useState<MapPoint[]>([]);
+  const [shadowHeight, setShadowHeight] = useState('30');
+  const [shadowCursor, setShadowCursor] = useState<MapPoint | null>(null);
+  const [redrawingShadowId, setRedrawingShadowId] = useState<string | null>(
+    null,
+  );
   const [calibrationDraft, setCalibrationDraft] = useState<MapPoint | null>(
     null,
   );
@@ -1345,6 +1365,10 @@ export default function Home({
   const [startInput, setStartInput] = useState('');
   const [destinationInput, setDestinationInput] = useState('');
   const [geoPosition, setGeoPosition] = useState<GeoPosition | null>(null);
+  const deviceHeading = useDeviceHeading(
+    appView && studentTab === 'map',
+    geoPosition,
+  );
   const [locating, setLocating] = useState(false);
   const [locationTracking, setLocationTracking] = useState(false);
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
@@ -1394,6 +1418,7 @@ export default function Home({
       departureTime: departureInstant,
       weather,
       basemapSupported: isCurrentBasemap(document),
+      buildings: document.solarBuildings,
     });
   }, [departureInstant, document, weatherReport.state]);
   const diagnostics = useMemo(
@@ -1424,6 +1449,7 @@ export default function Home({
         (link) => link.kind === 'path' && link.geometry.length > 2,
       ).length,
       area: document.areas.length,
+      shadow: (document.solarBuildings ?? []).length,
       obstacle: document.areas.reduce(
         (count, area) => count + area.obstacles.length,
         0,
@@ -1458,6 +1484,19 @@ export default function Home({
     selection?.type === 'area'
       ? document.areas.find((area) => area.id === selection.id)
       : undefined;
+  const selectedShadow =
+    selection?.type === 'shadow'
+      ? document.solarBuildings?.find(
+          (building) => building.id === selection.id,
+        )
+      : undefined;
+  const shadowDraft =
+    tool === 'shadow' && draftPoints.length > 0
+      ? rectangleFootprint(
+          draftPoints[0],
+          draftPoints[1] ?? shadowCursor ?? draftPoints[0],
+        )
+      : [];
   const selectedPlace = selectedPlaceId
     ? places.find((place) => place.id === selectedPlaceId)
     : undefined;
@@ -1630,6 +1669,8 @@ export default function Home({
 
   const clearDraft = useCallback(() => {
     setDraftPoints([]);
+    setShadowCursor(null);
+    setRedrawingShadowId(null);
     setCalibrationDraft(null);
     setDraftStartNodeId(null);
     setActiveNodeId(null);
@@ -1648,6 +1689,7 @@ export default function Home({
 
   const chooseTool = (nextTool: DrawingTool) => {
     setTool(nextTool);
+    if (nextTool === 'shadow') setCurrentLevelId(DEFAULT_LEVEL.id);
     clearDraft();
     if (nextTool !== 'select') setSelection(null);
     setNotice(TOOL_ITEMS.find((item) => item.id === nextTool)?.hint ?? '');
@@ -1906,6 +1948,13 @@ export default function Home({
   };
 
   const handleSelect = (point: MapPoint, svg = mapSvgRef.current) => {
+    const building =
+      currentLevelId === DEFAULT_LEVEL.id
+        ? [...(document.solarBuildings ?? [])]
+            .reverse()
+            .find((item) => pointInPolygon(point, item.footprint))
+        : undefined;
+    if (building) return setSelection({ type: 'shadow', id: building.id });
     const node = nearestNode(
       document,
       point,
@@ -1937,6 +1986,18 @@ export default function Home({
     }
     const point = mapPointFromEvent(event);
     if (tool === 'select') return handleSelect(point, event.currentTarget);
+    if (tool === 'shadow') {
+      setDraftPoints((points) =>
+        points.length === 1 ? [points[0], point] : [point],
+      );
+      setShadowCursor(point);
+      setNotice(
+        draftPoints.length === 1
+          ? '矩形已选好，设置高度后点击“保存阴影”'
+          : '已选第一个角，请点击矩形的另一个对角',
+      );
+      return;
+    }
     if (tool === 'calibration') {
       setCalibrationDraft(point);
       setNotice('已选择原图控制点，请在右侧填写同一地标的 WGS-84 坐标');
@@ -2051,6 +2112,46 @@ export default function Home({
   };
 
   const finishDraft = () => {
+    if (tool === 'shadow') {
+      const heightMeters = Number(shadowHeight);
+      if (!Number.isFinite(heightMeters) || heightMeters <= 0) {
+        setNotice('建筑高度必须是大于 0 的数字');
+        return;
+      }
+      if (
+        draftPoints.length !== 2 ||
+        Math.abs(draftPoints[0].x - draftPoints[1].x) * MAP_WIDTH < 1 ||
+        Math.abs(draftPoints[0].y - draftPoints[1].y) * MAP_HEIGHT < 1
+      ) {
+        setNotice('请点击两个不同的对角，矩形宽高至少为 1 个地图像素');
+        return;
+      }
+      const buildings = document.solarBuildings ?? [];
+      const previous = buildings.find(
+        (building) => building.id === redrawingShadowId,
+      );
+      const building = {
+        id: previous?.id ?? createFeatureId('shadow'),
+        name: previous?.name ?? `阴影建筑 ${buildings.length + 1}`,
+        heightMeters,
+        footprint: rectangleFootprint(draftPoints[0], draftPoints[1]),
+      };
+      commit(
+        {
+          ...document,
+          solarBuildings: previous
+            ? buildings.map((item) =>
+                item.id === previous.id ? building : item,
+              )
+            : [...buildings, building],
+        },
+        '已保存矩形与建筑高度',
+      );
+      clearDraft();
+      setSelection({ type: 'shadow', id: building.id });
+      setTool('select');
+      return;
+    }
     if (tool === 'curve' || tool === 'building') {
       if (!draftStartNodeId || draftPoints.length < 2) {
         setNotice('至少再点击一个终点');
@@ -2524,43 +2625,48 @@ export default function Home({
   useEffect(() => {
     if (!navigationDestination || !navigationOriginLevelId || !geoPosition)
       return;
-    const destination = campusNavigator.resolvePlaceEndpoint(
-      navigationDestination,
-    );
-    if (!destination) return;
-    const departure = new Date();
-    const sunlight = createCampusSunlightContext({
-      departureTime: departure,
-      weather:
-        weatherReport.state.status === 'ready'
-          ? weatherAtTime(weatherReport.state.snapshot, departure)
-          : null,
-      basemapSupported: isCurrentBasemap(document),
-    });
-    const routes = ROUTE_PROFILES.map(({ id }) => ({
-      profile: id,
-      route: campusNavigator.route({
-        origin: {
-          point: { x: geoPosition.x, y: geoPosition.y },
-          levelId: navigationOriginLevelId,
-        },
-        destination,
-        profile: id,
+    const frame = window.requestAnimationFrame(() => {
+      const destination = campusNavigator.resolvePlaceEndpoint(
+        navigationDestination,
+      );
+      if (!destination) return;
+      const departure = new Date();
+      const sunlight = createCampusSunlightContext({
         departureTime: departure,
-        audience,
-        wheelchair: id === 'accessible',
-        sunlight,
-      }),
-    }));
-    setAlternatives(routes);
-    const route = routes.find((item) => item.profile === activeProfile)?.route;
-    if (!route) {
-      setNotice('当前位置暂时无法规划路线，保留上次路线并继续定位');
-      return;
-    }
-    setNavigationSession((session) =>
-      session ? { ...session, route, origin: '我的位置' } : session,
-    );
+        weather:
+          weatherReport.state.status === 'ready'
+            ? weatherAtTime(weatherReport.state.snapshot, departure)
+            : null,
+        basemapSupported: isCurrentBasemap(document),
+      });
+      const routes = ROUTE_PROFILES.map(({ id }) => ({
+        profile: id,
+        route: campusNavigator.route({
+          origin: {
+            point: { x: geoPosition.x, y: geoPosition.y },
+            levelId: navigationOriginLevelId,
+          },
+          destination,
+          profile: id,
+          departureTime: departure,
+          audience,
+          wheelchair: id === 'accessible',
+          sunlight,
+        }),
+      }));
+      setAlternatives(routes);
+      const route = routes.find(
+        (item) => item.profile === activeProfile,
+      )?.route;
+      if (!route) {
+        setNotice('当前位置暂时无法规划路线，保留上次路线并继续定位');
+        return;
+      }
+      setNavigationSession((session) =>
+        session ? { ...session, route, origin: '我的位置' } : session,
+      );
+    });
+    return () => window.cancelAnimationFrame(frame);
   }, [
     navigationDestination,
     navigationOriginLevelId,
@@ -2655,6 +2761,28 @@ export default function Home({
     geoPosition && mapCalibration
       ? mapCalibration.localScale(geoPosition)
       : null;
+  const mapHeading =
+    geoPosition && mapCalibration && deviceHeading?.trueHeading !== undefined
+      ? headingOnMap(
+          mapCalibration,
+          geoPosition,
+          deviceHeading.trueHeading,
+          MAP_WIDTH,
+          MAP_HEIGHT,
+        )
+      : null;
+  const headingDegrees =
+    deviceHeading?.trueHeading ?? deviceHeading?.magneticHeading;
+  const headingStatusText =
+    deviceHeading?.status === 'low' || deviceHeading?.status === 'unreliable'
+      ? '请远离磁场干扰，转动手机校准'
+      : deviceHeading?.status === 'tilted'
+        ? '请稍放平手机查看朝向'
+        : deviceHeading?.status === 'unavailable'
+          ? '这台手机暂不支持指南针'
+          : deviceHeading?.status === 'stale'
+            ? '暂未获取朝向，请重新打开地图'
+            : '正在获取朝向…';
 
   useEffect(() => {
     if (!appView || appFallbackCenteredRef.current) return;
@@ -2779,18 +2907,58 @@ export default function Home({
                 </div>
                 {(draftPoints.length > 0 || activeNodeId) && (
                   <div className="draft-actions">
-                    {draftPoints.length > 0 && tool !== 'path' && (
-                      <Button size="sm" onClick={finishDraft}>
-                        <Save />
-                        完成当前绘制
-                      </Button>
-                    )}
+                    {draftPoints.length > 0 &&
+                      tool !== 'path' &&
+                      tool !== 'shadow' && (
+                        <Button size="sm" onClick={finishDraft}>
+                          <Save />
+                          完成当前绘制
+                        </Button>
+                      )}
                     <Button size="sm" variant="outline" onClick={clearDraft}>
                       取消 / 结束
                     </Button>
                   </div>
                 )}
               </div>
+
+              {tool === 'shadow' && (
+                <div className="panel-section compact-section shadow-fields">
+                  <p className="section-label">
+                    {redrawingShadowId ? '重画阴影矩形' : '矩形建筑阴影'}
+                  </p>
+                  <p className="helper-text">
+                    依次点击矩形的两个对角。高度以米为单位，保存后自动计算太阳投影。
+                  </p>
+                  <label className="field-label" htmlFor="shadow-draft-height">
+                    新建建筑高度（米）
+                    <Input
+                      type="number"
+                      id="shadow-draft-height"
+                      min="0"
+                      step="any"
+                      value={shadowHeight}
+                      onChange={(event) => setShadowHeight(event.target.value)}
+                    />
+                  </label>
+                  <Button
+                    size="sm"
+                    onClick={finishDraft}
+                    disabled={draftPoints.length !== 2}
+                  >
+                    <Save />
+                    保存阴影
+                  </Button>
+                  <a
+                    className="helper-text"
+                    href="/debug_sunshine"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    预览不同时刻的阴影 ↗
+                  </a>
+                </div>
+              )}
 
               {tool === 'vertical' && (
                 <div className="panel-section compact-section">
@@ -3336,6 +3504,25 @@ export default function Home({
         </aside>
 
         <div className="map-column">
+          {deviceHeading && (
+            <div className="app-heading-readout" aria-label="手机朝向">
+              <Compass size={20} aria-hidden="true" />
+              <span>
+                {headingDegrees === undefined
+                  ? headingStatusText
+                  : `朝向${headingLabel(headingDegrees)}`}
+                {headingDegrees !== undefined &&
+                  (deviceHeading.status === 'low' ||
+                    deviceHeading.trueHeading === undefined) && (
+                    <small>
+                      {deviceHeading.status === 'low'
+                        ? headingStatusText
+                        : '磁北方向 · 定位后校正'}
+                    </small>
+                  )}
+              </span>
+            </div>
+          )}
           <div className="map-toolbar">
             <div className="level-tabs">
               {document.levels.map((level) => (
@@ -3410,6 +3597,10 @@ export default function Home({
                 tabIndex={0}
                 aria-label={`${currentLevel?.name ?? ''}校园通行地图`}
                 onClick={handleMapClick}
+                onMouseMove={(event) => {
+                  if (tool === 'shadow' && draftPoints.length === 1)
+                    setShadowCursor(mapPointFromEvent(event));
+                }}
                 onKeyDown={(event) => {
                   if (event.key === 'Escape') clearDraft();
                 }}
@@ -3434,20 +3625,36 @@ export default function Home({
                           />
                         ))}
                       </g>
-                      <g className="solar-building-footprints">
-                        {NJUST_SOLAR_BUILDINGS.map((building) => (
-                          <polygon
-                            key={building.id}
-                            points={pointsAttribute(building.footprint)}
-                          >
-                            <title>
-                              {building.name} · {building.heightMeters} 米
-                            </title>
-                          </polygon>
-                        ))}
-                      </g>
                     </g>
                   )}
+                {mode === 'annotate' && currentLevelId === DEFAULT_LEVEL.id && (
+                  <g
+                    className="solar-building-footprints shadow-edit-layer"
+                    aria-label="自定义阴影建筑"
+                  >
+                    {(document.solarBuildings ?? []).map((building) => (
+                      <polygon
+                        key={building.id}
+                        points={pointsAttribute(building.footprint)}
+                        className={
+                          selectedShadow?.id === building.id
+                            ? 'is-selected'
+                            : ''
+                        }
+                      >
+                        <title>
+                          {building.name} · {building.heightMeters} 米
+                        </title>
+                      </polygon>
+                    ))}
+                    {shadowDraft.length > 0 && (
+                      <polygon
+                        className="is-draft"
+                        points={pointsAttribute(shadowDraft)}
+                      />
+                    )}
+                  </g>
+                )}
                 {mode === 'annotate' && tool === 'calibration' && (
                   <g className="calibration-anchors" aria-hidden="true">
                     {document.map.calibration?.anchors.map((anchor, index) => (
@@ -3565,7 +3772,7 @@ export default function Home({
                     ))}
                   </g>
                 )}
-                {draftPoints.length > 0 && (
+                {draftPoints.length > 0 && tool !== 'shadow' && (
                   <g className="draft-geometry">
                     {tool === 'area' || tool === 'obstacle' ? (
                       <polygon points={pointsAttribute(draftPoints)} />
@@ -3712,6 +3919,22 @@ export default function Home({
                 </g>
                 {geoPosition && (
                   <g className="geo-marker">
+                    {mapHeading !== null && (
+                      <g
+                        className="geo-heading"
+                        aria-label={`手机朝向${headingLabel(deviceHeading!.trueHeading!)}`}
+                        transform={`translate(${geoPosition.x * MAP_WIDTH} ${geoPosition.y * MAP_HEIGHT}) rotate(${mapHeading})`}
+                      >
+                        <path
+                          className="geo-heading-cone"
+                          d="M 0 0 L -29 -51 A 59 59 0 0 1 29 -51 Z"
+                        />
+                        <path
+                          className="geo-heading-arrow"
+                          d="M 0 -29 L 9 -14 L 0 -18 L -9 -14 Z"
+                        />
+                      </g>
+                    )}
                     <ellipse
                       className="geo-accuracy"
                       cx={geoPosition.x * MAP_WIDTH}
@@ -3825,13 +4048,15 @@ export default function Home({
                   <strong>
                     {tool === 'calibration'
                       ? '地图校准'
-                      : selectedNode
-                        ? '节点与地点'
-                        : selectedLink
-                          ? '通行段'
-                          : selectedArea
-                            ? '通行面'
-                            : '未选择要素'}
+                      : selectedShadow
+                        ? '建筑阴影'
+                        : selectedNode
+                          ? '节点与地点'
+                          : selectedLink
+                            ? '通行段'
+                            : selectedArea
+                              ? '通行面'
+                              : '未选择要素'}
                   </strong>
                 </div>
                 {selection && tool !== 'calibration' && (
@@ -3839,6 +4064,7 @@ export default function Home({
                     variant="outline"
                     size="icon-sm"
                     onClick={removeSelection}
+                    aria-label="删除所选要素"
                   >
                     <Trash2 />
                   </Button>
@@ -3856,6 +4082,31 @@ export default function Home({
                     onCommit={commit}
                     onApplyReference={applyReferenceCalibration}
                     onNotice={setNotice}
+                  />
+                ) : selectedShadow ? (
+                  <ShadowInspector
+                    key={JSON.stringify(selectedShadow)}
+                    building={selectedShadow}
+                    onSave={(building) =>
+                      commit(
+                        {
+                          ...document,
+                          solarBuildings: (document.solarBuildings ?? []).map(
+                            (item) =>
+                              item.id === building.id ? building : item,
+                          ),
+                        },
+                        '已更新建筑阴影',
+                      )
+                    }
+                    onRedraw={() => {
+                      clearDraft();
+                      setRedrawingShadowId(selectedShadow.id);
+                      setShadowHeight(String(selectedShadow.heightMeters));
+                      setTool('shadow');
+                      setCurrentLevelId(DEFAULT_LEVEL.id);
+                      setNotice('点击两个对角重画矩形，保存后替换原轮廓');
+                    }}
                   />
                 ) : selectedNode ? (
                   <NodeInspector

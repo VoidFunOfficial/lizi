@@ -248,5 +248,13 @@ export function migrateToCurrentBasemap(
     nodes,
     links,
     areas,
+    solarBuildings: (document.solarBuildings ?? []).map((building) => ({
+      ...building,
+      footprint: projectGeometry(
+        building.footprint,
+        `阴影建筑 ${building.id}`,
+        true,
+      ),
+    })),
   };
 }

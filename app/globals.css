@@ -1674,6 +1674,40 @@
 .app-shell.is-app-view .geo-marker {
   filter: drop-shadow(0 3px 7px rgb(0 0 0 / 0.3));
 }
+.app-heading-readout {
+  position: absolute;
+  top: calc(max(9px, env(safe-area-inset-top, 0px)) + 118px);
+  left: max(16px, env(safe-area-inset-left, 0px));
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100% - 32px);
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--app-material);
+  color: var(--foreground);
+  box-shadow: 0 2px 12px rgb(0 0 0 / 0.12);
+  font-size: 0.875rem;
+  pointer-events: none;
+}
+.app-heading-readout small {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.8125rem;
+}
+.geo-heading {
+  pointer-events: none;
+}
+.geo-heading-cone {
+  fill: rgb(0 122 255 / 0.22);
+}
+.geo-heading-arrow {
+  fill: #007aff;
+  stroke: white;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
 .app-shell.is-app-view .geo-ring {
   stroke-width: 6;
 }
@@ -2125,4 +2159,27 @@
     border: 1px solid #1d1d1f;
     background: white;
   }
+}
+
+/* User-authored footprints stay editable even when there is no sunshine. */
+.shadow-edit-layer {
+  pointer-events: none;
+}
+.shadow-edit-layer polygon {
+  fill: rgb(217 145 32 / 0.2);
+  stroke: #a56613;
+}
+.shadow-edit-layer polygon.is-selected {
+  fill: rgb(217 145 32 / 0.35);
+  stroke: #704008;
+  stroke-width: 2.5;
+}
+.shadow-edit-layer polygon.is-draft {
+  fill: rgb(217 145 32 / 0.15);
+  stroke-dasharray: 6 4;
+}
+.shadow-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }

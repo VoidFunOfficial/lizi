@@ -57,14 +57,21 @@ App 地图不显示标注名称和通行面覆盖层；地点点击、搜索、�
 
 真实课表原件与校历图片未复制到公开资源目录；测试夹具已移除学生、教师及班级身份信息。此改动更新 Web App 源码，不会自动覆盖已安装的 Android APK。
 
-## 教务一键自动导入（2026-09-10）
+## 教务一键自动导入（2026-09-12 更新统一身份认证）
 
-「我的」页面提供「一键自动导入课程」，课表与行程页面不展示导入表单。在应用内输入用户名、密码、验证码，点击「登录并一键导入」；应用连接 8080 登录页、读取 9080 课表页面选中的学期，再 POST 学校「打印」使用的 `/njlgdx/xskb/xskb_print.do?xnxq01id=学期&zc=`，获取所有周次的 Excel。识别完整且校历匹配时直接保存并切回课表，自动更新行程；校历未知或解析存在提示时才进入原有核对流程。文件导入仍可用。
+「我的」页面提供「一键自动导入课程」。在应用内输入学号、统一身份认证密码和验证码，点击「登录并一键导入」。按照学校更新后的顺序：
 
-网页通过同源 `/api/student/jw` 转发连接，应用服务器会临时处理登录请求与返回文件，不保存、不记录密码、学校 Cookie 或课表。请求只允许指定教务主机和登录/课表路径，逐跳验证重定向，单次响应最多 5 MB，所有响应禁用缓存。每个导入组件独立维护学校 Cookie（支持同名 Cookie 的不同路径），只驻留内存，关闭或切换页面会丢弃会话；验证码会话有效期 5 分钟。验证码失败不会自动重试密码，用户需刷新后再提交。
+1. GET `https://ids.njust.edu.cn/authserver/login?service=https%3A%2F%2Fehall2.njust.edu.cn%2Flogin`，读取 `pwdFromId` 密码表单的 `execution`、`cllt`、`dllt`、`lt`、`_eventId` 和 `pwdEncryptSalt`。验证码来自 `/authserver/getCaptcha.htl`。
+2. 在客户端用 Web Crypto 按学校 `encryptPassword` 的 AES-CBC/PKCS7 规则加密密码（64 字符随机前缀、16 字符 IV）；只提交加密的 `password`，不提交 `passwordText`，保留 `service`。跟随办事大厅回调建立单点登录会话。
+3. 必须先访问办事大厅正式教务入口 `http://bkjw.njust.edu.cn/njlgdx/indexsso.jsp`。该入口跳转到 IDS 为 `https://bkjw.njust.edu.cn/njlgdx/indexsso.jsp` 签发独立 CAS 票据，回调设置 `MOD_AUTH_CAS`，再经 `/njlgdx/xk/LoginToXk` 建立教务 `JSESSIONID`。办事大厅的登录 Cookie 本身不能登录教务主页；直接访问主页会返回旧登录表单。这一步完成后才访问 `http://bkjw.njust.edu.cn/njlgdx/framework/main.jsp`，再进入 `http://bkjw.njust.edu.cn/njlgdx/xskb/xskb_list.do`。主页仍要求登录时停止导入，不继续导出。
+4. 读取学校当前选中学期，POST `/njlgdx/xskb/xskb_print.do?xnxq01id=学期&zc=`，获取所有周次 Excel。识别完整且校历匹配时直接保存并切回课表；校历未知或解析存在提示时进入原有核对流程。文件导入仍可用。
 
-Android 使用 `JwImport` 原生插件直连学校，相同界面、解析器和会话流程，无需网页服务器。HTTP 例外只覆盖学校两个 IP，WebView 继续禁用混合内容；关闭 Capacitor 参数日志，防止调试日志记录登录信息。学校当前登录地址使用 HTTP。源码更新后需重新构建并安装 APK 才会包含该插件。
+网页通过同源 `/api/student/jw` 转发学校请求，不保存、不记录密码、学校 Cookie 或课表。只允许 `ids.njust.edu.cn`、`ehall2.njust.edu.cn` 的 HTTPS 认证路径和 `bkjw.njust.edu.cn` 的 HTTP/HTTPS 登录、课表路径；逐跳验证，禁止跨域 307/308 转发密码请求体，响应最多 5 MB，禁用缓存。Cookie 按 host-only/Domain、Path、Secure、有效期隔离，允许学校显式设置的 `.njust.edu.cn` Cookie；Secure Cookie 不发送到 HTTP。会话只驻留内存，关闭后清理。登录参数有效期 5 分钟，每次提交只使用一次，失败不自动重试密码。
 
-验证记录：已实查 8080 登录字段/验证码和已登录的 9080 课表页面「打印」请求；本地网页已真实显示学校验证码。会话/导出测试使用脱敏课表与模拟登录响应，不代表真实账号的全流程验收。真实账号登录至自动导入，以及 Android 设备直连仍需完成现场验收。
+学校公开脚本会根据账号失败次数决定是否显示字符验证码；本应用始终请求并提交字符验证码，保留原有一步导入表单。当前不支持滑块、短信二次认证、扫码或 passkey 登录；发现滑块配置时明确报错，不尝试绕过。
+
+Android `JwImport` 插件沿用相同界面与会话流程，直接连接学校。HTTP 例外仅覆盖 `bkjw.njust.edu.cn`，WebView 继续禁用混合内容，Capacitor 不记录调用参数。更新原生配置后需重新构建并安装 APK。
+
+验证记录（2026-09-12）：已在用户授权下用真实账号复现“办事大厅登录成功，但直接访问教务主页仍未登录”，从办事大厅教务服务配置确认 `indexsso.jsp` 入口。修复后的 `JwSession` 与 Cookie/URL 校验代码通过命令行直连学校跑通统一认证、教务 CAS、主页、课表导出和解析，返回有效 XLS。回归测试模拟同一跳转链，要求教务票据和 `LoginToXk` 会话先建立，不能把主页直接返回成功作为测试前提。凭据、认证票据与原始课表未写入源码或测试夹具。网页服务器转发及 Android 真机仍需各自验证，命令行直连不等于设备验收。
 
 界面文案已去除连接协议、存储方式、地点匹配实现、太阳角度和模型运行状态等开发说明；保留导入替换、错误反馈和操作所需提示。技术说明保留在本文档。

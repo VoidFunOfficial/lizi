@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type SubmitEvent } from 'react';
 import Image from 'next/image';
 import { Download, RefreshCw, X } from 'lucide-react';
 import { JwSession } from '@/lib/student/jw/session';
-import { jwTransport } from '@/lib/student/jw/client';
+import { jwTransport, encryptJwPassword } from '@/lib/student/jw/client';
 import type { Timetable } from '@/lib/student/timetable';
 
 export default function JwImport({
@@ -21,12 +21,12 @@ export default function JwImport({
   const [image, setImage] = useState('');
   const [busy, setBusy] = useState(false);
   const [refreshing, setRefreshing] = useState(true);
-  const [message, setMessage] = useState('正在连接教务系统…');
+  const [message, setMessage] = useState('正在连接统一身份认证…');
   const [error, setError] = useState('');
   const active = useRef(true);
   useEffect(() => {
     active.current = true;
-    const current = new JwSession(jwTransport);
+    const current = new JwSession(jwTransport, encryptJwPassword);
     session.current = current;
     void current
       .captcha()
@@ -35,9 +35,13 @@ export default function JwImport({
         setImage(src);
         setMessage('');
       })
-      .catch(() => {
+      .catch((e: unknown) => {
         if (session.current === current)
-          setError('验证码加载失败，请检查网络后重试。');
+          setError(
+            e instanceof Error
+              ? e.message
+              : '验证码加载失败，请检查网络后重试。',
+          );
       })
       .finally(() => {
         if (session.current === current) setRefreshing(false);
@@ -59,7 +63,7 @@ export default function JwImport({
       form.current?.querySelector<HTMLInputElement>('[name="captcha"]');
     if (input) input.value = '';
     session.current?.close();
-    const current = new JwSession(jwTransport);
+    const current = new JwSession(jwTransport, encryptJwPassword);
     session.current = current;
     try {
       const src = await current.captcha();
@@ -67,8 +71,11 @@ export default function JwImport({
         setImage(src);
         setMessage('');
       }
-    } catch {
-      if (active.current) setError('验证码加载失败，请检查网络后重试。');
+    } catch (e) {
+      if (active.current)
+        setError(
+          e instanceof Error ? e.message : '验证码加载失败，请检查网络后重试。',
+        );
     } finally {
       if (active.current) setRefreshing(false);
     }
@@ -144,7 +151,7 @@ export default function JwImport({
             <input
               name="password"
               type="password"
-              placeholder="教务系统密码"
+              placeholder="统一身份认证密码"
               maxLength={32}
               autoComplete="off"
               required
@@ -156,7 +163,7 @@ export default function JwImport({
               <input
                 name="captcha"
                 placeholder="输入右侧字符"
-                maxLength={6}
+                maxLength={10}
                 autoCapitalize="none"
                 spellCheck={false}
                 autoComplete="off"
@@ -175,7 +182,7 @@ export default function JwImport({
               {image ? (
                 <Image
                   src={image}
-                  alt="教务登录验证码"
+                  alt="统一身份认证验证码"
                   width={90}
                   height={36}
                   unoptimized

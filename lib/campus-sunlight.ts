@@ -212,6 +212,7 @@ export function createCampusSunlightContext(options: {
   departureTime: Date;
   weather: WeatherAtTime | null;
   basemapSupported: boolean;
+  buildings?: readonly SolarBuilding[];
 }): SunlightContext {
   const departureTime = options.departureTime.toISOString();
   if (!options.basemapSupported) {
@@ -263,7 +264,7 @@ export function createCampusSunlightContext(options: {
     weatherSource: options.weather.source,
     weatherCode: 0,
     position,
-    shadowPolygons: createBuildingShadowPolygons(position),
+    shadowPolygons: createBuildingShadowPolygons(position, options.buildings),
   };
 }
 
