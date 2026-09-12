@@ -1,0 +1,53 @@
+# 构建、版本与发布
+
+仓库：<https://github.com/VoidFunOfficial/lizi>。主分支使用 `main`；工作流也兼容默认分支为 `master` 的已有仓库。
+
+## 日常开发
+
+使用 `.nvmrc` 指定的 Node 22 和 `package.json` 指定的 pnpm。运行 `pnpm install --frozen-lockfile`、`pnpm check`。`pnpm build` 构建包含天气和教务 API 的 Cloudflare Worker；`pnpm android` 生成调试 APK；macOS/Xcode 26 上 `pnpm ios` 生成模拟器 App。
+
+PR、普通分支 push、手动 CI 都会检查 Web、Android 和 iOS。默认分支 push 由 Release 工作流调用同一套 CI，成功后处理版本。Actions Artifacts 保留 14 天，Release 附件长期保留。
+
+## 版本管理
+
+唯一手工维护的应用版本是根 `package.json` 的 `version`，初始值 `0.1.0`。Release Please 根据 Conventional Commits 自动维护版本 PR、`.release-please-manifest.json` 和 `CHANGELOG.md`。使用 squash merge，PR 标题写成：
+
+- `fix: 修复定位偏移`：补丁版本。
+- `feat: 新增收藏地点`：次版本。
+- `feat!: 修改课表数据格式` 或提交正文 `BREAKING CHANGE:`：破坏性变化（0.x 阶段按 Release Please 的 pre-major 策略升级）。
+
+`docs:`、`chore:`、`ci:` 本身通常不产生版本发布。合并自动生成的版本 PR 后，下一次 Release 运行先完成三端构建，再创建 `vX.Y.Z` 标签和 GitHub Release，并上传本次构建产物。无需手动修改 Gradle 的版本。
+
+Android/iOS 构建号由 `major * 1000000 + minor * 1000 + patch` 生成，例如 `0.1.0 → 1000`。minor/patch 上限为 999，只支持稳定版本，确保升级时构建号递增。`pnpm version:check` 验证版本；`node scripts/app-version.mjs v0.1.0` 额外验证标签。iOS CLI 将版本传入 Xcode；直接使用 Xcode 时请手动同步其版本设置。
+
+## GitHub 一次性设置
+
+在 Settings → Actions → General 开启 **Allow GitHub Actions to create and approve pull requests**。工作流已声明所需的最小任务权限。
+
+默认使用 `GITHUB_TOKEN`。它创建的版本 PR 不会自动触发另一个 CI 事件；版本 PR 合并到默认分支后仍会在 Release 流程中运行完整检查。若分支保护要求版本 PR 的 CI 必须先通过，可配置 `RELEASE_PLEASE_TOKEN`（受限到本仓库的 GitHub App token 或 fine-grained PAT，需 Contents、Pull requests、Issues 读写权限），或者在该 PR 分支上手动运行 CI。参见 [Release Please 官方说明](https://github.com/googleapis/release-please-action#other-actions-on-release-please-prs)。
+
+### Android 签名
+
+在 Settings → Secrets and variables → Actions 配置：
+
+| Secret | 内容 |
+| --- | --- |
+| `ANDROID_KEYSTORE_BASE64` | 现有发布 keystore 的 Base64 内容 |
+| `ANDROID_KEYSTORE_PASSWORD` | keystore 密码 |
+| `ANDROID_KEY_ALIAS` | 签名 alias |
+| `ANDROID_KEY_PASSWORD` | alias 密码 |
+
+四项齐全时自动构建正式 APK 和 AAB；部分配置时任务失败并要求补全。全部未配置时发布明确标注的 debug APK，用于体验。不同 runner 的 debug 签名不同，升级可能需要卸载旧版，正式分发应配置长期使用并安全备份的同一把密钥。不要把 keystore 或密码提交到 Git。
+
+Release 的 `njustmap-android.apk` 是官网使用的固定下载文件名。它按签名配置指向正式包或调试包；`BUILD-INFO.txt` 记录签名模式和提交 SHA。首次 Release 完成前该下载链接尚不可用。旧官网 APK 已移到本地 `outputs/android/legacy-download.apk`，没有删除原始产物。
+
+### 附件与恢复
+
+- `njustmap-web.tar.gz`：Worker 构建，含服务端 API。不能直接当作纯静态 GitHub Pages 网站。
+- `njustmap-android.apk`：固定下载入口；另附带版本号的 debug APK，配置签名后附带 AAB。
+- `njustmap-ios-simulator.zip`：仅模拟器 App；不是可装到 iPhone 的 IPA。iPhone 签名分发见 [IOS.md](IOS.md)。
+- `BUILD-INFO.txt`、`SHA256SUMS.txt`：构建信息和全部附件校验和。
+
+若 Release 已创建但附件上传失败，在默认分支手动运行 **Release**，输入现有标签（如 `v0.1.1`）。流水线检出该标签，重建并检查版本一致性，然后补传附件；不会创建新版本。自动标签由 `GITHUB_TOKEN` 创建时，不依赖另一个 tag/release 事件触发，附件任务直接在同一工作流运行。
+
+GitHub 发布并不自动部署网站，也不自动提交 App Store/Google Play。

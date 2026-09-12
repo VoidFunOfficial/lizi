@@ -38,3 +38,24 @@ next-env.d.ts
 /.wrangler/
 /outputs/
 /work/
+
+# Nested projects and local credentials
+**/node_modules/
+*.jks
+*.keystore
+*.p12
+*.mobileprovision
+.env.example
+!.env.example
+__pycache__/
+*.pyc
+
+# Reproducible film exports and copied SDK build outputs
+/123.mp4
+/123.mp4.manifest.json
+/ad/assets/rendered/
+/ad/templates/**/rendered.mp4
+/fourier-sdk/dist/
+
+# APK downloads are supplied by the release build, never versioned
+/public/downloads/*.apk

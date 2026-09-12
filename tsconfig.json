@@ -21,11 +21,12 @@
   },
   "include": [
     "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    "app/**/*.ts",
+    "app/**/*.tsx",
+    "components/**/*.tsx",
+    "lib/**/*.ts",
+    "tests/**/*.ts",
+    "*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "ad", "fourier-sdk", "dist", "outputs"]
 }

@@ -1,5 +1,13 @@
 # NJUST 校园混合通行导航
 
+[![CI](https://github.com/VoidFunOfficial/lizi/actions/workflows/ci.yml/badge.svg)](https://github.com/VoidFunOfficial/lizi/actions/workflows/ci.yml)
+[![Release](https://github.com/VoidFunOfficial/lizi/actions/workflows/release.yml/badge.svg)](https://github.com/VoidFunOfficial/lizi/actions/workflows/release.yml)
+
+[下载最新版本](https://github.com/VoidFunOfficial/lizi/releases/latest) · [开发规范](CONTRIBUTING.md) · [自动构建与版本发布](docs/RELEASING.md)
+
+使用 Node（`.nvmrc`）和项目锁定的 pnpm，执行 `pnpm install --frozen-lockfile`。提交会自动执行 Web、Android 和 iOS 模拟器构建；合并版本 PR 后自动创建 Release。Android 正式签名需要配置发布文档列出的 GitHub Secrets。
+
+
 这是一个以南京理工大学江阴校区导览图为底图的 React 校园标注与步行导航应用。默认底图 `public/campus-guide-georectified-high.png` 从用户提供的 `7500×4710` 高清 `map-high.jpg` 做全局仿射几何纠偏，保留原图的建筑、道路、水体和中文名称，并重采样到北向上的固定 WGS-84 网格。高清栅格用于缩放显示，路线、区域、障碍物、地点和定位仍位于稳定的 `2038×1279` SVG 逻辑坐标空间。
 
 纠偏过程会旋转、错切和缩放整张原图，但不会生成式重绘建筑或改写标签。原图和历史精修图上的归一化标注会经过同一 WGS-84 变换自动迁移，不能再原位照搬。`public/campus-precise.svg` 仍保留为可选的 WGS-84 校核层，不是默认导览底图。

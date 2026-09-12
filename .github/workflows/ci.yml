@@ -1,0 +1,80 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches-ignore: [main, master]
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+        default: ''
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      - run: pnpm check
+      - run: pnpm version:check
+      - run: pnpm build
+      - name: Package Worker web build
+        run: tar -czf njustmap-web.tar.gz -C dist .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web
+          path: njustmap-web.tar.gz
+          if-no-files-found: error
+          retention-days: 14
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+      - run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
+      - run: pnpm android --skip-checks
+      - run: ./gradlew --no-daemon testDebugUnitTest
+        working-directory: android
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-debug
+          path: outputs/android/*-debug.apk
+          if-no-files-found: error
+          retention-days: 14
+  ios:
+    runs-on: macos-26
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      - run: pnpm test:ios
+      - run: pnpm ios --skip-checks
+      - name: Package simulator app
+        run: ditto -c -k --keepParent outputs/ios/simulator/Build/Products/Debug-iphonesimulator/App.app njustmap-ios-simulator.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios-simulator
+          path: njustmap-ios-simulator.zip
+          if-no-files-found: error
+          retention-days: 14

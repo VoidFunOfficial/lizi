@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { createHash } from 'node:crypto';
+import { appVersion } from './app-version.mjs';
 import {
   copyFileSync,
   existsSync,
@@ -17,6 +18,7 @@ const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const packageJson = JSON.parse(
   readFileSync(join(projectRoot, 'package.json'), 'utf8'),
 );
+const versionInfo = appVersion();
 const arguments_ = process.argv.slice(2);
 const mode =
   arguments_.find((argument) => !argument.startsWith('--')) ?? 'debug';
@@ -43,7 +45,7 @@ function printHelp() {
   ANDROID_KEY_PASSWORD
 
 可选版本环境变量：
-  ANDROID_VERSION_CODE（默认 1）
+  ANDROID_VERSION_CODE（默认根据 package.json 版本计算）
   ANDROID_VERSION_NAME（默认 package.json 的 version）`);
 }
 
@@ -204,7 +206,8 @@ const gradleEnvironment = {
   ...process.env,
   ANDROID_HOME: androidSdk,
   ANDROID_SDK_ROOT: androidSdk,
-  ANDROID_VERSION_CODE: process.env.ANDROID_VERSION_CODE ?? '1',
+  ANDROID_VERSION_CODE:
+    process.env.ANDROID_VERSION_CODE ?? String(versionInfo.code),
   ANDROID_VERSION_NAME: process.env.ANDROID_VERSION_NAME ?? packageJson.version,
   ...(javaHome ? { JAVA_HOME: javaHome } : {}),
 };

@@ -1,0 +1,14 @@
+name: Set up Node and pnpm
+description: Install the Node and pnpm versions declared by this repository.
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v6
+      with:
+        node-version-file: .nvmrc
+        package-manager-cache: false
+    - uses: pnpm/action-setup@v6
+      with:
+        run_install: false
+    - shell: bash
+      run: pnpm install --frozen-lockfile

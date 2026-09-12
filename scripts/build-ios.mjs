@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 
 import { spawnSync } from 'node:child_process';
+import { appVersion } from './app-version.mjs';
 import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
+const versionInfo = appVersion();
 const modes = ['simulator', 'open', 'device', 'web'];
 const mode = args.find((arg) => !arg.startsWith('-')) ?? 'simulator';
 
@@ -187,6 +189,8 @@ const buildArgs = [
   ...(process.env.IOS_BUNDLE_ID
     ? [`PRODUCT_BUNDLE_IDENTIFIER=${process.env.IOS_BUNDLE_ID}`]
     : []),
+  `MARKETING_VERSION=${versionInfo.version}`,
+  `CURRENT_PROJECT_VERSION=${versionInfo.code}`,
   'build',
 ];
 run('xcodebuild', buildArgs);

@@ -1,7 +1,10 @@
 apply plugin: 'com.android.application'
 
-def androidVersionCode = (System.getenv('ANDROID_VERSION_CODE') ?: '1').toInteger()
-def androidVersionName = System.getenv('ANDROID_VERSION_NAME') ?: '0.1.0'
+def appPackage = new groovy.json.JsonSlurper().parse(rootProject.file('../package.json'))
+def versionParts = appPackage.version.tokenize('.').collect { it.toInteger() }
+def defaultVersionCode = versionParts[0] * 1000000 + versionParts[1] * 1000 + versionParts[2]
+def androidVersionCode = (System.getenv('ANDROID_VERSION_CODE') ?: defaultVersionCode.toString()).toInteger()
+def androidVersionName = System.getenv('ANDROID_VERSION_NAME') ?: appPackage.version
 def releaseKeystorePath = System.getenv('ANDROID_KEYSTORE_PATH')
 
 android {

@@ -1,0 +1,134 @@
+name: Release
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag to rebuild and re-upload (for example v0.1.1)
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  build:
+    if: github.ref_name == github.event.repository.default_branch
+    uses: ./.github/workflows/ci.yml
+    with:
+      ref: ${{ inputs.tag || github.sha }}
+  version:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    outputs:
+      released: ${{ steps.release.outputs.release_created || steps.manual.outputs.released }}
+      tag: ${{ steps.release.outputs.tag_name || steps.manual.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.tag || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - name: Validate requested release
+        if: github.event_name == 'workflow_dispatch'
+        id: manual
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          node scripts/app-version.mjs "$RELEASE_TAG"
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY"
+          echo 'released=true' >> "$GITHUB_OUTPUT"
+          echo "tag=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
+      - uses: googleapis/release-please-action@v4
+        if: github.event_name == 'push'
+        id: release
+        with:
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN || github.token }}
+          target-branch: ${{ github.event.repository.default_branch }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+  publish:
+    needs: [build, version]
+    if: needs.version.outputs.released == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: write
+    env:
+      RELEASE_TAG: ${{ needs.version.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.version.outputs.tag }}
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      - run: node scripts/app-version.mjs "$RELEASE_TAG"
+      - uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+      - name: Select Android signing mode
+        id: signing
+        env:
+          KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [[ -n "$KEYSTORE$STORE_PASSWORD$KEY_ALIAS$KEY_PASSWORD" ]]; then
+            test -n "$KEYSTORE" && test -n "$STORE_PASSWORD" && test -n "$KEY_ALIAS" && test -n "$KEY_PASSWORD"
+            umask 077
+            printf '%s' "$KEYSTORE" | base64 --decode > "$RUNNER_TEMP/release.jks"
+            echo 'enabled=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'enabled=false' >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/setup-java@v5
+        if: steps.signing.outputs.enabled == 'true'
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+        if: steps.signing.outputs.enabled == 'true'
+      - name: Build signed APK and AAB
+        if: steps.signing.outputs.enabled == 'true'
+        env:
+          ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/release.jks
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
+          pnpm android:release --skip-checks
+          pnpm android:bundle --skip-checks
+          cp outputs/android/*-release.apk release-assets/njustmap-android.apk
+          cp outputs/android/*.aab release-assets/
+      - name: Use clearly labelled debug APK when signing is not configured
+        if: steps.signing.outputs.enabled != 'true'
+        run: |
+          cp release-assets/*-debug.apk release-assets/njustmap-android.apk
+          printf '%s\n' 'Android: debug APK; production signing secrets are not configured. Debug keys differ across runners; upgrading may require uninstalling the previous debug app.' > release-assets/BUILD-INFO.txt
+      - name: Describe and checksum release assets
+        env:
+          SIGNED: ${{ steps.signing.outputs.enabled }}
+        run: |
+          printf 'Tag: %s\nCommit: %s\nAndroid release signing: %s\niOS: simulator app only, not an iPhone IPA.\nWeb: Cloudflare Worker build with API routes; not a standalone static site.\n' "$RELEASE_TAG" "$(git rev-parse HEAD)" "$SIGNED" >> release-assets/BUILD-INFO.txt
+          cd release-assets
+          sha256sum * > SHA256SUMS.txt
+      - name: Upload assets to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$RELEASE_TAG" release-assets/* --repo "$GITHUB_REPOSITORY" --clobber
+      - name: Remove temporary signing key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/release.jks"
