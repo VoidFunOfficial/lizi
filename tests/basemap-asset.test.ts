@@ -6,7 +6,8 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
-import sharp from 'sharp';
+// Vinext declares its optional 'sharp' import as unknown; use Sharp's typed entry.
+import sharp from 'sharp/lib/index.js';
 
 import { MAP_HEIGHT, MAP_WIDTH } from '../lib/campus-model.ts';
 import { buildMapCalibration } from '../lib/map-calibration.ts';
