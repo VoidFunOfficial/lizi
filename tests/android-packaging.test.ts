@@ -26,19 +26,13 @@ void test('Android packaging exports and opens the dedicated app route', async (
 });
 
 void test('Android native project declares precise location and guarded release signing', async () => {
-  const [manifest, buildConfig, pluginConfig, wrapper] = await Promise.all([
+  const [manifest, buildConfig, packageConfig, wrapper] = await Promise.all([
     readFile(
       new URL('android/app/src/main/AndroidManifest.xml', projectRoot),
       'utf8',
     ),
     readFile(new URL('android/app/build.gradle', projectRoot), 'utf8'),
-    readFile(
-      new URL(
-        'android/app/src/main/assets/capacitor.plugins.json',
-        projectRoot,
-      ),
-      'utf8',
-    ),
+    readFile(new URL('package.json', projectRoot), 'utf8'),
     stat(new URL('android/gradlew', projectRoot)),
   ]);
 
@@ -47,6 +41,6 @@ void test('Android native project declares precise location and guarded release 
   assert.match(manifest, /android\.permission\.INTERNET/);
   assert.match(buildConfig, /ANDROID_KEYSTORE_PATH/);
   assert.match(buildConfig, /ANDROID_VERSION_CODE/);
-  assert.match(pluginConfig, /@capacitor\/geolocation/);
+  assert.ok(JSON.parse(packageConfig).dependencies['@capacitor/geolocation']);
   assert.ok((wrapper.mode & 0o111) !== 0, 'Gradle wrapper must be executable');
 });

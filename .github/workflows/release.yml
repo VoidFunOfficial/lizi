@@ -88,6 +88,10 @@ jobs:
           persist-credentials: false
       - uses: ./.github/actions/setup
       - run: node scripts/app-version.mjs "$RELEASE_TAG"
+      - name: Verify artifacts were built from this release commit
+        env:
+          BUILT_REF: ${{ inputs.tag || github.sha }}
+        run: test "$(git rev-parse HEAD)" = "$(git rev-parse "$BUILT_REF^{commit}")"
       - uses: actions/download-artifact@v4
         with:
           path: release-assets

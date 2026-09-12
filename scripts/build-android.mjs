@@ -177,6 +177,17 @@ if (!existsSync(join(androidRoot, 'gradlew'))) {
   run(pnpm, ['exec', 'cap', 'add', 'android']);
 }
 run(pnpm, ['exec', 'cap', 'sync', 'android']);
+// This generated file exists only after sync; validate it during packaging,
+// while source-only tests remain runnable immediately after a fresh clone.
+const plugins = JSON.parse(
+  readFileSync(
+    join(androidRoot, 'app/src/main/assets/capacitor.plugins.json'),
+    'utf8',
+  ),
+);
+if (!plugins.some((plugin) => plugin.pkg === '@capacitor/geolocation')) {
+  fail('Capacitor sync 未注册原生定位插件。');
+}
 run(process.execPath, ['scripts/generate-android-assets.mjs']);
 
 const manifest = join(androidRoot, 'app/src/main/AndroidManifest.xml');
