@@ -6,6 +6,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
+import sharp from 'sharp';
 
 import { MAP_HEIGHT, MAP_WIDTH } from '../lib/campus-model.ts';
 import { buildMapCalibration } from '../lib/map-calibration.ts';
@@ -275,7 +276,7 @@ void test('the stored affine is the same legacy-to-WGS84 transform used by runti
   assert.equal(target.quality.declaredAccuracyRmsMeters, 16);
 });
 
-void test('the georectification generator reproduces the committed raster byte-for-byte', async () => {
+void test('the georectification generator reproduces the committed raster pixels', async () => {
   const temporaryDirectory = await mkdtemp(
     join(tmpdir(), 'njust-georectified-guide-'),
   );
@@ -297,10 +298,32 @@ void test('the georectification generator reproduces the committed raster byte-f
       },
     );
     assert.equal(result.status, 0, result.stderr || result.stdout);
-    const generatedBytes = await readFile(generated);
+    // PNG compression and metadata vary across FFmpeg/zlib builds. Compare
+    // decoded pixels; the committed asset's SHA-256 is checked separately above.
+    const [actual, expected] = await Promise.all([
+      sharp(generated)
+        .removeAlpha()
+        .raw()
+        .toBuffer({ resolveWithObject: true }),
+      sharp(fileURLToPath(refinedGuideUrl))
+        .removeAlpha()
+        .raw()
+        .toBuffer({ resolveWithObject: true }),
+    ]);
+    assert.deepEqual(actual.info, expected.info);
+    let differingChannels = 0;
+    let totalDifference = 0;
+    let maxDifference = 0;
+    for (let i = 0; i < actual.data.length; i++) {
+      const difference = Math.abs(actual.data[i] - expected.data[i]);
+      if (difference) differingChannels++;
+      totalDifference += difference;
+      maxDifference = Math.max(maxDifference, difference);
+    }
     assert.equal(
-      createHash('sha256').update(generatedBytes).digest('hex'),
-      REFINED_GUIDE_SHA256,
+      differingChannels,
+      0,
+      `Raster mismatch: ${differingChannels} channels differ; mean=${totalDifference / actual.data.length}, max=${maxDifference}`,
     );
   } finally {
     await rm(temporaryDirectory, { recursive: true, force: true });
