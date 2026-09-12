@@ -1,0 +1,463 @@
+# @fourier-video/sdk
+
+English | [简体中文](./README.zh-CN.md)
+
+**Turn frontend visual capabilities into video components that agents can understand, configure, and reuse.**
+
+Fourier SDK is the typed authoring interface between Fourier hosts and the developer ecosystem. It declares Projects, Scenes, and Templates, and it authors React, Motion, Shader, Text Motion, Three.js, and other programmatic visual artifacts. SDK ABI v1.2 uses real DOM/CSS/WAAPI/WebGL, sampled through Fourier Core at an absolute rational time supplied by the host; Core and the Render Engine remain able to read ABI v1 and v1.1 artifacts.
+
+## Why Fourier SDK
+
+- **Reuse the web platform:** author with TypeScript, TSX, React, CSS, Motion, and Three.js instead of learning a closed animation description format.
+- **Designed for deterministic rendering:** absolute time, stable randomness, controlled media, and a host-owned timeline keep preview, seek, test, and export behavior aligned.
+- **Types and schemas serve people and agents:** developers get type checking, while agents get discoverable parameters, defaults, constraints, and usage descriptions.
+- **Build once, reuse across projects:** components, Scenes, Templates, and brand systems can be previewed and tested independently, then published to Fourier World.
+- **The SDK owns the runtime:** artifacts do not manage their own React, Three.js, or JSX runtime versions, reducing host/component version drift.
+
+Developers use the SDK to create high-quality visual capabilities; agents choose parameters and organize them into videos. [Fourier Core](../fourier-core/README.md) supplies the SDK's local preview/testing/World artifact host, the [Render Engine](../fourier-render-engine/README.md) executes complete projects, and [Fourier World](../fourier-world/README.md) makes components discoverable and reusable.
+
+## Installation
+
+Requires Bun `>= 1.3`. Installing the SDK transitively installs `@fourier-video/core`; users do not install Core explicitly. The SDK owns React, its JSX runtime, and React types, so a video project does not need to install or declare React. The DOM Timeline also requires the Chromium build pinned to Playwright `1.62.0`:
+
+```bash
+bun add @fourier-video/sdk
+bunx playwright install chromium
+```
+
+macOS uses headed Chromium with CDP viewport capture. Linux uses a headless shell with `HeadlessExperimental.beginFrame`. Both pause virtual time; wall-clock sleeps and ordinary Playwright screenshots are not fallback rendering paths.
+
+## TSX project declarations
+
+`@fourier-video/sdk/project` exports `defineProject`, `defineTemplate`, and typed JSX nodes. Projects, Scenes, and Templates all use `main.tsx` as their only entry point:
+
+```tsx
+import {
+  Canvas,
+  defineProject,
+  Project,
+  Text,
+  Timeline,
+} from "@fourier-video/sdk/project";
+
+export default defineProject(
+  <Project id="hello" version="1.0" audioSampleRate={48_000}>
+    <Canvas
+      width={1920}
+      height={1080}
+      fps={30}
+      background="#000000"
+      colorSpace="sRGB"
+    />
+    <Timeline>
+      <Text
+        id="title"
+        duration="2s"
+        role="title"
+        content="Hello"
+        x={960}
+        y={540}
+        width={1200}
+        height={180}
+        layer={1}
+        font="fonts/Inter.ttf"
+        fontSize={96}
+        lineHeight={1.1}
+        color="#FFF"
+        align="center"
+      />
+    </Timeline>
+  </Project>,
+);
+```
+
+Authoring properties use native booleans, object-valued `props`, `tts`, and `keyframes`, and string `content`. `after` and `with` reference bare IDs. Trimming and artifact export selection use `sourceIn`/`sourceOut` and `exportName`. Declarations compile into the engine IR and are ultimately rendered by FFmpeg.
+
+## ABI v1.2 React artifacts
+
+An artifact uses `component`, with the ABI v1.2 marker. `component` reads props; stable width, height, and seed values come from hooks. Frame, FPS, progress, and time are deliberately absent from the component interface.
+
+```tsx
+import {
+  defineReact,
+  field,
+  useRef,
+  useFourierContext,
+  useFourierLifecycle,
+  useFourierTimeline,
+} from "@fourier-video/sdk";
+
+export default defineReact({
+  name: "MetricPanel",
+  schema: { value: field.number({ min: 0, default: 42 }) },
+  component({ props }) {
+    const root = useRef<HTMLDivElement>(null);
+    const { width, height } = useFourierContext();
+    const timeline = useFourierTimeline();
+
+    useFourierLifecycle({
+      fourierStart() {
+        if (root.current === null) throw new Error("missing root");
+        timeline.animate(root.current, [
+          { opacity: 0, transform: "translateY(20px)" },
+          { opacity: 1, transform: "translateY(0px)" },
+        ]);
+      },
+      fourierEnd() {},
+    });
+
+    return <div ref={root} style={{ width, height }}>{props.value}</div>;
+  },
+  designPreview() {
+    return {
+      props: {},
+      composition: { width: 640, height: 360, durationSeconds: 3 },
+    };
+  },
+});
+```
+
+A React artifact with no lifecycle, animation, media, SMIL, or render driver is static and can reuse one sampled PNG. React artifacts may register zero or one lifecycle; Motion artifacts must register exactly one.
+
+React hooks and types such as `ReactNode`, `CSSProperties`, and `RefObject` must come from `@fourier-video/sdk` or its `/react`, `/motion`, and `/three` entry points. Do not import `react`, `react/jsx-runtime`, or `three` directly from artifact source. The host aliases the implicit JSX runtime and SDK to the versions resolved from the integrating SDK/render package, so an artifact directory does not need its own `package.json` or `node_modules`.
+
+## ABI v1.2 Motion
+
+A Motion explicitly declares whether it supports text. Image, video, and React subjects enter `component` at the current time. Text never enters that interface; a text-capable Motion implements a separate `textComponent` that receives the source string.
+
+```tsx
+export default defineMotion({
+  name: "Reveal",
+  schema: {},
+  supportsTextMotion: false,
+  component({ subject }) {
+    const root = useRef<HTMLDivElement>(null);
+    const timeline = useFourierTimeline();
+    useFourierLifecycle({
+      fourierStart() {
+        if (root.current === null) throw new Error("missing root");
+        timeline.animate(root.current, [
+          { opacity: 0, transform: "scale(.9)" },
+          { opacity: 1, transform: "scale(1)" },
+        ]);
+      },
+      fourierEnd() {},
+    });
+    return <div ref={root}>{subject}</div>;
+  },
+  designPreview() {
+    return {
+      props: {},
+      subject: <img src={imageDataUri} width={640} height={360} />,
+      composition: { width: 640, height: 360, durationSeconds: 3 },
+    };
+  },
+});
+```
+
+A text-capable Motion supplies both interfaces:
+
+```tsx
+export default defineMotion({
+  name: "TextReveal",
+  schema: {},
+  supportsTextMotion: true,
+  component({ subject }) {
+    return <div>{subject}</div>;
+  },
+  textComponent({ text }) {
+    return <span>{text}</span>;
+  },
+  designPreview() {
+    return {
+      props: {},
+      subject: "Fourier",
+      composition: { width: 640, height: 120, durationSeconds: 3 },
+    };
+  },
+});
+```
+
+Declaring `supportsTextMotion: true` without `textComponent` fails during definition. A Motion that declares `false` is rejected when applied to a text or subtitle host. A string returned as `designPreview().subject` automatically selects the text entry point.
+
+With `fill="none"`, inactive intervals return the original subject. `backwards`, `forwards`, and `both` use the local start boundary, continuous active time, or full-duration boundary as appropriate.
+
+## ABI v1.2 Shader modifiers
+
+`defineShader()` turns an SDK-owned WebGL2 shader into a reusable modifier. The current host raster is available as `uFourierSource`; the existing time, progress, resolution, duration, and seed uniforms remain available. `designPreview().subject` is a bundled image URL or data URI.
+
+```tsx
+import { defineFourierShader, defineShader, field } from "@fourier-video/sdk";
+
+const shader = defineFourierShader({
+  uniforms: { amount: "float" },
+  fragmentShader: `in vec2 vUv; uniform float amount; out vec4 fragColor;
+    void main() { vec4 s = texture(uFourierSource, vUv);
+      fragColor = vec4(mix(s.rgb, s.bgr, amount), s.a); }`,
+});
+
+export default defineShader({
+  name: "ChannelShader",
+  schema: { amount: field.number({ min: 0, max: 1, default: 1 }) },
+  shader,
+  uniforms: ({ props }) => ({ amount: props.amount }),
+  designPreview: () => ({
+    props: {},
+    subject: imageUrl,
+    composition: { width: 640, height: 360, durationSeconds: 3 },
+  }),
+});
+```
+
+Place shader artifacts in `shaders/`, then nest any number of `<Shader>` nodes under an Image, Video, Text, Subtitle, or ReactLayer host:
+
+```tsx
+<Image {...imageProps}>
+  <Motion id="reveal" at="0f" duration="30f" fill="both" component="Reveal.tsx" />
+  <Shader id="grade" at="0f" duration="30f" fill="both"
+    component="ChannelShader.tsx" props={{ amount: 0.8 }} layer={10} />
+  <Shader id="grain" at="0f" duration="30f" fill="both"
+    component="Grain.tsx" layer={20} />
+  <Transform {...transformProps} />
+</Image>
+```
+
+The engine evaluates Motion, then enabled Shader passes by ascending `layer` (declaration order breaks ties), then Transform. Every pass keeps the host dimensions. `fill="none"` passes the input raster through outside the active interval.
+
+## Timeline and deterministic randomness
+
+`useFourierTimeline().animate()` does not return a native `Animation`; playback remains under host control. When duration is omitted, the animation fills the host duration. The runtime supports a constrained set of duration, delay, iteration, playback-rate, and composite semantics. Calling `element.animate()` directly fails with `UNREGISTERED_WAAPI_ANIMATION`.
+
+The DOM timeline also controls native `<audio>`, `<video>`, and SVG SMIL animations. Media remains paused and seeks to the host's absolute time. Do not call `play()`, set `currentTime`, or advance the SVG timeline yourself.
+
+Random effects must use a stable seed:
+
+```ts
+const { seed } = useFourierContext();
+const random = createFourierPrng(`${seed}:noise`);
+const x = random() * 20 - 10;
+```
+
+### Declarative Fourier Motion
+
+Common CSS animation can use the SDK's built-in `motion.*` interface without installing `motion` or `framer-motion`. `FourierMotion` hides the single lifecycle registration and places any number of `motion.div`, `motion.span`, or `motion.create(tag)` elements on the same host-controlled timeline:
+
+```tsx
+import { FourierMotion, motion } from "@fourier-video/sdk/motion";
+
+function Reveal({ children }) {
+  return (
+    <FourierMotion>
+      <motion.div
+        animate={[
+          { opacity: 0, y: 48, filter: "blur(14px)", offset: 0 },
+          { opacity: 1, y: 0, filter: "blur(0px)", offset: 0.42 },
+          { opacity: 1, y: 0, filter: "blur(0px)", offset: 1 },
+        ]}
+        transition={{ ease: [0.16, 1, 0.3, 1] }}
+      >
+        {children}
+      </motion.div>
+    </FourierMotion>
+  );
+}
+```
+
+Numeric `x`, `y`, and `z` values use pixels; numeric rotation and skew values use degrees. Transition duration and delay use seconds. Omitting duration still fills the Motion host duration.
+
+## Fourier Three.js
+
+3D React artifacts use the SDK-owned `@fourier-video/sdk/three` entry point, which exports the React authoring API, Three.js, `GLTFLoader`, and `FourierCanvas`:
+
+```tsx
+import modelUrl from "./assets/model.glb";
+import {
+  FourierCanvas,
+  GLTFLoader,
+  Group,
+  defineReact,
+  useRef,
+} from "@fourier-video/sdk/three";
+
+export default defineReact({
+  name: "RotatingModel",
+  schema: {},
+  component() {
+    const model = useRef<Group | null>(null);
+    return (
+      <FourierCanvas
+        onCreate={async ({ scene }) => {
+          const gltf = await new GLTFLoader().loadAsync(modelUrl);
+          model.current = gltf.scene;
+          scene.add(gltf.scene);
+        }}
+        onFrame={({ progress }) => {
+          if (model.current) model.current.rotation.y = progress * Math.PI * 2;
+        }}
+      />
+    );
+  },
+  designPreview() {
+    return {
+      props: {},
+      composition: { width: 960, height: 540, durationSeconds: 6 },
+    };
+  },
+});
+```
+
+`onCreate` may load bundled GLB assets asynchronously. `onFrame` must remain synchronous and derive state directly from `timeMilliseconds`, `timeSeconds`, or `progress`; it must not accumulate state or start `requestAnimationFrame`. Preview scrubbing, tests, and final export all seek to an absolute time before rendering WebGL.
+
+Browsers cannot load `.blend` directly. Export GLB/GLTF from Blender and import it as a local asset. [Example3D.tsx](./example/Example3D.tsx) demonstrates deterministic rotation with the included placeholder model.
+
+## Universe projection
+
+`@fourier-video/sdk/universe` places existing React, Canvas, or `FourierCanvas` output in an unbounded 2D world; it does not introduce a new renderer:
+
+```tsx
+import { Universe, World, defineCamera } from "@fourier-video/sdk/universe";
+
+const camera = defineCamera({
+  width: 1920,
+  height: 1080,
+  moves: [{
+    at: "0f",
+    duration: "60f",
+    to: { kind: "fit", target: "diagram", fit: "contain", padding: 80 },
+    path: { kind: "linear" },
+    ease: "ease-in-out",
+  }],
+});
+
+function SpatialDiagram() {
+  return (
+    <Universe camera={camera}>
+      <World id="diagram" x={4000} y={-1200} width={1200} height={800}>
+        <ArchitectureDiagram />
+      </World>
+    </Universe>
+  );
+}
+```
+
+Camera coordinates use a center position, logical width and height, zoom, and clockwise rotation. World bounds support camera fitting and safe clipping. Camera Motion supports pose/fit targets, time expressions, several path types, and deterministic custom paths. `defineCameraProgram` adds multiple cameras and cuts; multiple Universe instances can form split-screen or picture-in-picture layouts.
+
+For perspective React worlds, ABI v1.1 adds `@fourier-video/sdk/universe-3d`. `Universe3D` and `World3D` preserve ordinary DOM/Motion children while Three.js calculates the perspective and inverse camera matrices:
+
+```tsx
+import { Universe3D, World3D, defineCamera3D } from "@fourier-video/sdk/universe-3d";
+
+const camera = defineCamera3D({
+  fov: 48,
+  initial: { x: 0, y: 0, z: 0, rx: 0, ry: 0, rz: 0 },
+  moves: [{ at: "90f", duration: "45f", to: { rx: -3, ry: 18 }, ease: "ease-in-out" }],
+});
+
+<Universe3D camera={camera}>
+  <World3D id="title" x={420} y={-80} z={-1350} width={900} height={320}>
+    <Title />
+  </World3D>
+</Universe3D>;
+```
+
+Positions use `x/y/z`; Euler rotations use degree-valued `rx/ry/rz`. Omitted move axes hold their previous values. Camera3D moves share the host absolute timeline and only expose standard CSS easing or cubic-bezier tuples; authored overshoot is expressed as two consecutive moves.
+
+## Placeholder assets and fonts
+
+The [`placeholder`](./placeholder) directory contains local images, transparent subjects, video, fonts, and 3D models for reproducible previews. Copy any placeholder required by a publishable component into that component's own `assets/` or `fonts/` directory and include it in the package `files` list.
+
+Local OTF, TTF, WOFF, and WOFF2 files can be loaded with `loadFont()`:
+
+```tsx
+import { defineReact, loadFont } from "@fourier-video/sdk";
+import titleFontUrl from "./fonts/Title.otf";
+
+const titleFont = loadFont(titleFontUrl);
+
+// Inside component:
+<div style={{ fontFamily: titleFont }}>Fourier</div>
+```
+
+Placeholders make previews runnable and reproducible. Production assets should still arrive through schema props, a Motion subject, or project resources. The runtime rejects network access by default, so remote image, video, and font URLs are not a placeholder strategy.
+
+## Preview, test, and check
+
+```bash
+bunx fourier-sdk preview
+# Loads every SDK example as a card gallery
+
+bunx fourier-sdk preview ./components
+# Also accepts a directory or one artifact
+
+# The CLI also exposes a CORS-enabled listener on 0.0.0.0:3212
+bunx fourier-sdk preview ./components --public-port 4321
+
+fourier check ./components/MetricPanel.tsx
+```
+
+An authoring entry point only needs one default-exported `defineReact()`, `defineMotion()`, or `defineShader()` definition. Do not create a separate preview renderer, frame endpoint, or preview configuration. `designPreview()` declares props, canvas, duration, and the required subject for Motion/Shader artifacts; it does not implement rendering.
+
+An ABI v1 React artifact whose production image never changes with host time should declare `static: true`. The runtime verifies that it did not register a lifecycle, animation, media element, SMIL animation, or render driver, then renders one PNG and reuses it for the node duration. Without an explicit declaration, the mounted runtime infers whether the artifact is static.
+
+The standard ABI v1 testing entry point accepts a source file path:
+
+```ts
+import { openArtifact } from "@fourier-video/sdk/testing";
+
+const fixture = await openArtifact("/absolute/path/MetricPanel.tsx");
+try {
+  const frame = await fixture.renderFrame({ frame: 20 });
+  const exact = await fixture.renderTime({
+    time: { numerator: 1n, denominator: 3n },
+  });
+  await fixture.assertDeterministic({ times: [
+    { numerator: 0n, denominator: 1n },
+    { numerator: 1n, denominator: 3n },
+  ] });
+  console.log(frame.sha256, exact.sha256);
+} finally {
+  await fixture.close();
+}
+```
+
+`assertDeterministic` requires exactly one non-empty `frames` or `times` array.
+
+## Publish to Fourier World
+
+A publishable npm package contains 1—50 component directories. The root `fourier.components` array lists their `package.json` files; every member keeps the existing entry, category, Agent guidance, use cases, tags, and visual style fields.
+
+```bash
+fourier-sdk login --email author@example.com
+fourier-sdk publish https://www.npmjs.com/package/@studio/fourier-components/v/1.2.3 --dry-run
+fourier-sdk publish https://www.npmjs.com/package/@studio/fourier-components/v/1.2.3
+```
+
+A dry run downloads the exact public npm version, verifies its registry SHA-512 integrity, compiles every member, and renders browser-compatible H.264 previews. A real publish uploads only those previews and npm metadata; World never stores source archives. After approval, install all members or one `#ComponentName` with:
+
+```bash
+fourier-sdk search "cinematic title animation for a product launch" --type motion --style cinematic --json
+fourier-sdk add https://www.npmjs.com/package/@studio/fourier-components/v/1.2.3
+fourier-sdk del https://www.npmjs.com/package/@studio/fourier-components/v/1.2.3#MetricPanel
+```
+
+`search` requires no login and runs Fourier World's hybrid keyword/semantic retrieval. Results retain the existing component fields and add exact `npmPackageUrl` / `npmComponentUrl` references. Installation still targets `components/@studio/MetricPanel` and records the verified source in `.fourier-world.json` v2. `del` moves managed components into `.fourier-trash` by default. See the [Fourier World Publishing Guide](./docs/PUBLISHING.md) for the complete manifest.
+
+## Documentation and examples
+
+- [Agent SDK Guide: React, Motion, and Three.js](./docs/AGENT_SDK_GUIDE.md)
+- [Complete API reference](./docs/API.md)
+- [Development rules](./docs/DEVELOPMENT.md)
+- [Fourier World publishing](./docs/PUBLISHING.md)
+- [Declarative Motion and component examples](./example/README.md)
+- [Render Engine](../fourier-render-engine/README.md)
+- [Fourier Core](../fourier-core/README.md)
+
+## Maintenance commands
+
+```bash
+bun run typecheck
+bun test
+bun run test:dom
+bun run build
+bun run prepack
+```

@@ -9,7 +9,7 @@ void test('/app uses the transparent crest and navigation-only app view', async 
     await Promise.all([
       readFile(new URL('app/app/page.tsx', projectRoot), 'utf8'),
       readFile(new URL('app/app/app-page.tsx', projectRoot), 'utf8'),
-      readFile(new URL('app/page.tsx', projectRoot), 'utf8'),
+      readFile(new URL('app/map-workspace.tsx', projectRoot), 'utf8'),
       readFile(new URL('app/globals.css', projectRoot), 'utf8'),
     ]);
 

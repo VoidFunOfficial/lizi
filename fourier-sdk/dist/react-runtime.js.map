@@ -1,0 +1,10 @@
+{
+  "version": 3,
+  "sources": ["../src/react-runtime.ts"],
+  "sourcesContent": [
+    "/**\n * React authoring surface owned by the Fourier SDK.\n *\n * Artifact authors import React primitives from the SDK so projects do not\n * need to install or coordinate a separate React runtime.\n */\nexport { default as React } from \"react\";\nexport {\n  Children,\n  Component,\n  Fragment,\n  Profiler,\n  PureComponent,\n  StrictMode,\n  Suspense,\n  cloneElement,\n  createContext,\n  createElement,\n  createRef,\n  forwardRef,\n  isValidElement,\n  lazy,\n  memo,\n  startTransition,\n  use,\n  useActionState,\n  useCallback,\n  useContext,\n  useDebugValue,\n  useDeferredValue,\n  useEffect,\n  useId,\n  useImperativeHandle,\n  useInsertionEffect,\n  useLayoutEffect,\n  useMemo,\n  useOptimistic,\n  useReducer,\n  useRef,\n  useState,\n  useSyncExternalStore,\n  useTransition,\n  version as reactVersion,\n} from \"react\";\nexport type {\n  ComponentProps,\n  ComponentPropsWithRef,\n  ComponentPropsWithoutRef,\n  CSSProperties,\n  Dispatch,\n  ElementType,\n  FC,\n  JSX,\n  Key,\n  PropsWithChildren,\n  ReactElement,\n  ReactNode,\n  Ref,\n  RefAttributes,\n  RefObject,\n  SetStateAction,\n} from \"react\";\n"
+  ],
+  "mappings": ";;AAMA,oBAAoB;AACpB;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;",
+  "debugId": "8A19A0F899A1E0CD64756E2164756E21",
+  "names": []
+}

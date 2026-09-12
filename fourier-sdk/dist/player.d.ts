@@ -1,0 +1,3 @@
+export declare const PLAYER_HTML = "<!doctype html>\n<html lang=\"zh-CN\">\n<head>\n  <meta charset=\"utf-8\" />\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n  <meta name=\"theme-color\" content=\"#090909\" />\n  <title>Fourier Studio</title>\n  <link rel=\"stylesheet\" href=\"/preview-app.css?v=__FOURIER_PREVIEW_ASSET_VERSION__\" />\n</head>\n<body>\n  <div id=\"root\"></div>\n  <script type=\"module\" src=\"/preview-app.js?v=__FOURIER_PREVIEW_ASSET_VERSION__\"></script>\n</body>\n</html>";
+export declare const PLAYER_CSS: string;
+//# sourceMappingURL=player.d.ts.map

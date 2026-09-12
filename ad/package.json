@@ -1,0 +1,17 @@
+{
+  "name": "njustmap-film",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "preview": "bun scripts/preview.ts",
+    "sfx": "python3 scripts/build-sfx.py",
+    "render": "python3 scripts/render.py",
+    "render:cli": "FOURIER_DOM_TIMEOUT_MS=60000 fourier render main.tsx -o output/NJustMap-1080p60-SFX.mp4 --overwrite --crf 17 --dom-pages 1 --frame-concurrency 1",
+    "render:isolated": "python3 scripts/render.py",
+    "check": "bun scripts/check.ts"
+  },
+  "dependencies": {
+    "@fourier-video/sdk": "2.5.0",
+    "@fourier-video/core": "1.7.0"
+  }
+}

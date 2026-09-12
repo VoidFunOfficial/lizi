@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
-import Home from '../page';
+import Home from '../map-workspace';
 
 type SplashPhase = 'visible' | 'leaving' | 'hidden';
 

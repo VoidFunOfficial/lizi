@@ -1,0 +1,19 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "paths": {
+      "@fourier-video/core": ["../fourier-core/dist/index.d.ts"],
+      "@fourier-video/core/*": ["../fourier-core/dist/*.d.ts"],
+      "@fourier-video/sdk": ["./src/index.ts"],
+      "@fourier-video/sdk/*": ["./src/*.ts"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["tests/**", "scripts/**"]
+}
