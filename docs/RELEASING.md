@@ -59,11 +59,11 @@ Release 的 `njustmap-android.apk` 是官网使用的固定下载文件名。它
 
 ### 附件与恢复
 
-- `njustmap-web.tar.gz`：Worker 构建，含服务端 API。不能直接当作纯静态 GitHub Pages 网站。
+- `njustmap-web.tar.gz`：Vercel 部署包，含静态页面与 Node.js API。
 - `njustmap-android.apk`：固定下载入口；另附带版本号的 debug APK，配置签名后附带 AAB。
 - `njustmap-ios-simulator.zip`：仅模拟器 App；不是可装到 iPhone 的 IPA。iPhone 签名分发见 [IOS.md](IOS.md)。
 - `BUILD-INFO.txt`、`SHA256SUMS.txt`：构建信息和全部附件校验和。
 
 若 Release 已创建但附件上传失败，在默认分支手动运行 **Release**，输入现有标签（如 `v0.1.1`）。流水线检出该标签，重建并检查版本一致性，然后补传附件；不会创建新版本。自动标签由 `GITHUB_TOKEN` 创建时，不依赖另一个 tag/release 事件触发，附件任务直接在同一工作流运行。
 
-GitHub 发布并不自动部署网站，也不自动提交 App Store/Google Play。
+Web 通过 Vercel Git 集成随 main 提交自动部署，详见 [VERCEL.md](VERCEL.md)。GitHub Release 不负责提交 App Store/Google Play。

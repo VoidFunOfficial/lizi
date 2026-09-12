@@ -1,0 +1,17 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "pnpm install --frozen-lockfile",
+  "buildCommand": "pnpm build:vercel",
+  "outputDirectory": "dist/client",
+  "cleanUrls": true,
+  "functions": {
+    "api/**/*.ts": { "maxDuration": 30 }
+  },
+  "headers": [
+    {
+      "source": "/(.*).rsc",
+      "headers": [{ "key": "Content-Type", "value": "text/x-component" }]
+    }
+  ]
+}

@@ -3,7 +3,7 @@
 [![CI](https://github.com/VoidFunOfficial/lizi/actions/workflows/ci.yml/badge.svg)](https://github.com/VoidFunOfficial/lizi/actions/workflows/ci.yml)
 [![Release](https://github.com/VoidFunOfficial/lizi/actions/workflows/release.yml/badge.svg)](https://github.com/VoidFunOfficial/lizi/actions/workflows/release.yml)
 
-[下载最新版本](https://github.com/VoidFunOfficial/lizi/releases/latest) · [开发规范](CONTRIBUTING.md) · [自动构建与版本发布](docs/RELEASING.md)
+[下载最新版本](https://github.com/VoidFunOfficial/lizi/releases/latest) · [开发规范](CONTRIBUTING.md) · [自动构建与版本发布](docs/RELEASING.md) · [Vercel 部署](docs/VERCEL.md)
 
 使用 Node（`.nvmrc`）和项目锁定的 pnpm，执行 `pnpm install --frozen-lockfile`。提交会自动执行 Web、Android 和 iOS 模拟器构建；推送 `vX.Y.Z` 标签后自动创建 Release（自动版本 PR 默认关闭）。Android 正式签名需要配置发布文档列出的 GitHub Secrets。
 

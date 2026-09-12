@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": ">=22.13.0"
+    "node": "22.x"
   },
   "scripts": {
     "basemap:guide": "node scripts/generate-georectified-guide.mjs",
@@ -22,13 +22,15 @@
     "test:ios": "node scripts/test-ios-services.mjs",
     "start": "wrangler dev --config dist/server/wrangler.json",
     "test": "node --experimental-strip-types --test tests/*.test.ts",
-    "lint": "oxlint app lib tests",
+    "lint": "oxlint app api lib tests",
     "format": "oxfmt",
     "typecheck": "tsc --noEmit",
     "check": "pnpm test && pnpm lint && pnpm typecheck",
     "version:check": "node scripts/app-version.mjs",
     "test:release": "node --experimental-strip-types --test tests/release-version.test.ts",
-    "release:version": "node scripts/bump-version.mjs"
+    "release:version": "node scripts/bump-version.mjs",
+    "build:vercel": "NJUST_VERCEL_BUILD=1 vinext build",
+    "vercel:package": "node scripts/prepare-vercel.mjs"
   },
   "dependencies": {
     "@base-ui/react": "1.7.0",
@@ -67,7 +69,8 @@
     "tailwindcss": "4.2.1",
     "typescript": "5.9.3",
     "vite": "8.0.13",
-    "wrangler": "4.92.0"
+    "wrangler": "4.92.0",
+    "esbuild": "0.27.3"
   },
   "type": "module",
   "packageManager": "pnpm@11.22.0+sha512.1ff870c4c6133dfd88fb2afc46dd13d47f09c9794b438c6fdb47ca98caf3bc16381ee0be93a091b8e3824cf01f889f46d7d9e20910fb0be1ab0fb5baa80dd621"

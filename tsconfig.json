@@ -26,7 +26,8 @@
     "components/**/*.tsx",
     "lib/**/*.ts",
     "tests/**/*.ts",
-    "*.ts"
+    "*.ts",
+    "api/**/*.ts"
   ],
   "exclude": ["node_modules", "ad", "fourier-sdk", "dist", "outputs"]
 }

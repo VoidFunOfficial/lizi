@@ -141,7 +141,7 @@ jobs:
         env:
           SIGNED: ${{ steps.signing.outputs.enabled }}
         run: |
-          printf 'Tag: %s\nCommit: %s\nAndroid release signing: %s\niOS: simulator app only, not an iPhone IPA.\nWeb: Cloudflare Worker build with API routes; not a standalone static site.\n' "$RELEASE_TAG" "$(git rev-parse HEAD)" "$SIGNED" >> release-assets/BUILD-INFO.txt
+          printf 'Tag: %s\nCommit: %s\nAndroid release signing: %s\niOS: simulator app only, not an iPhone IPA.\nWeb: Vercel package with static pages and Node.js API functions.\n' "$RELEASE_TAG" "$(git rev-parse HEAD)" "$SIGNED" >> release-assets/BUILD-INFO.txt
           cd release-assets
           sha256sum * > SHA256SUMS.txt
       - name: Upload assets to the release
