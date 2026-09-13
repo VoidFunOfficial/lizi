@@ -28,6 +28,7 @@ for (const file of [
 }
 for (const [route, method] of [
   ['weather', 'GET'],
+  ['updates', 'GET'],
   ['student/jw', 'POST'],
 ]) {
   const target = join(output, 'functions/api', `${route}.func`);

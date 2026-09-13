@@ -1,79 +1,83 @@
-# 构建、版本与发布
+# CNB 构建、版本与发布
 
-仓库：<https://github.com/VoidFunOfficial/lizi>。主分支使用 `main`；工作流也兼容默认分支为 `master` 的已有仓库。
+仓库：https://cnb.cool/voidfun/njustmap 。主分支 main，流水线入口 `.cnb.yml`，构建镜像 `.cnb/Dockerfile`。Node 22.16.0、pnpm 11.22.0、JDK 21、Android SDK 36 与现有项目一致。
 
-## 日常开发
+## 自动流程
 
-使用 `.nvmrc` 指定的 Node 22 和 `package.json` 指定的 pnpm。运行 `pnpm install --frozen-lockfile`、`pnpm check`。`pnpm build` 构建包含天气和教务 API 的 Cloudflare Worker；`pnpm android` 生成调试 APK；macOS/Xcode 26 上 `pnpm ios` 生成模拟器 App。
+- main push：测试、lint、类型检查、版本检查、Web 构建和打包验证、Android debug 构建及 Java 单元测试；附件保存在该提交；全部通过后部署现有 Vercel 项目。
+- 其他分支 push、PR 创建/更新：同样构建和检查，不读取发布密钥、不部署生产。
+- 每周一北京时间 09:00：main 回归构建。原 Dependabot 仅更新 GitHub Actions，Actions 删除后该配置一并退役；此任务不修改依赖、不创建 PR。
+- 推送 vX.Y.Z：先检查标签与 package.json 一致，再完整构建，使用原有 Android 正式密钥生成 APK/AAB，创建 CNB 草稿、上传并确认全部附件，最后公开版本并更新 latest。失败不会向客户端宣布新版本。
+- CNB 页面选择 main 手动运行可重试 Web 构建和部署；选择 vX.Y.Z 标签手动运行可恢复草稿发布。已公开附件不覆盖；旧版本恢复不会把 latest 降级。
 
-PR、普通分支 push、手动 CI 都会检查 Web、Android 和 iOS。默认分支 push 由 Release 工作流调用同一套 CI，成功后处理版本。Actions Artifacts 保留 14 天，Release 附件长期保留。
+按当前要求，CNB 不运行 iOS。`pnpm ios`、`pnpm test:ios` 和原生源码仍可在 Mac 本地使用。没有自动上传 App Store/Google Play。
 
 ## 版本管理
 
-唯一手工维护的应用版本是根 `package.json` 的 `version`，初始值 `0.1.0`。Release Please 根据 Conventional Commits 自动维护版本 PR、`.release-please-manifest.json` 和 `CHANGELOG.md`。使用 squash merge，PR 标题写成：
+应用版本只维护根 package.json。`pnpm release:version patch`（或 minor/major）修改版本；补充 CHANGELOG.md、docs/releases/vX.Y.Z.md，提交到 main，再创建并推送同名标签。
 
-- `fix: 修复定位偏移`：补丁版本。
-- `feat: 新增收藏地点`：次版本。
-- `feat!: 修改课表数据格式` 或提交正文 `BREAKING CHANGE:`：破坏性变化（0.x 阶段按 Release Please 的 pre-major 策略升级）。
+```sh
+pnpm release:version patch
+pnpm check
+git add package.json CHANGELOG.md docs/releases
+git commit -m "chore: release vX.Y.Z"
+git push origin main
+git tag vX.Y.Z
+git push origin vX.Y.Z
+```
 
-`docs:`、`chore:`、`ci:` 本身通常不产生版本发布。合并自动生成的版本 PR 后，下一次 Release 运行先完成三端构建，再创建 `vX.Y.Z` 标签和 GitHub Release，并上传本次构建产物。无需手动修改 Gradle 的版本。
+示例中的 vX.Y.Z 必须替换成 package.json 的实际版本。Android/iOS 构建号仍按 major * 1000000 + minor * 1000 + patch 生成。Release Please 及其 manifest 已删除，避免保留不会执行的 GitHub 配置。
 
-Android/iOS 构建号由 `major * 1000000 + minor * 1000 + patch` 生成，例如 `0.1.0 → 1000`。minor/patch 上限为 999，只支持稳定版本，确保升级时构建号递增。`pnpm version:check` 验证版本；`node scripts/app-version.mjs v0.1.0` 额外验证标签。iOS CLI 将版本传入 Xcode；直接使用 Xcode 时请手动同步其版本设置。
+## CNB 密钥文件
 
-## 当前启用：标签自动发布
+在 voidfun 组织下建立 **密钥类型** 仓库 `njustmap-secrets`，main 分支包含下面两个文件。不要放进公开 njustmap 仓库。流水线仅在对应签名或部署步骤导入。
 
-按仓库所有者要求，Actions 创建/批准 PR 权限保持关闭。默认分支 push 执行三端 CI；推送版本标签时自动创建 Release 并上传附件。不会创建、批准或合并任何 PR。
+android.yml：
 
-发布步骤：
+```yaml
+allow_slugs: [voidfun/njustmap]
+allow_events: [tag_push, web_trigger]
+allow_branches: ['v*']
+ANDROID_KEYSTORE_BASE64: <现有 keystore 的 Base64>
+ANDROID_KEYSTORE_PASSWORD: <现有密码>
+ANDROID_KEY_ALIAS: <现有 alias>
+ANDROID_KEY_PASSWORD: <现有密码>
+```
 
-1. 运行 `pnpm release:version patch`（也可使用 `minor` 或 `major`），同时更新 package.json 与版本 manifest。
-2. 执行 `pnpm check`，提交版本变更并推送 main。
-3. 为该提交创建与 package.json 相同版本的标签，例如 `git tag v0.1.1`，然后 `git push origin v0.1.1`。
+vercel.yml：
 
-标签和包版本不一致时发布失败。无需手工修改 Android/iOS 构建号。
+```yaml
+allow_slugs: [voidfun/njustmap]
+allow_events: [push, web_trigger]
+allow_branches: [main]
+VERCEL_TOKEN: <现有 Vercel 部署令牌>
+VERCEL_ORG_ID: <现有 Vercel 团队 ID>
+VERCEL_PROJECT_ID: <现有 lizi 项目 ID>
+```
 
-## 可选：开启自动版本 PR
+CNB 自动提供临时 CNB_TOKEN 给当前仓库流水线，用来创建 Release、上传附件，无需在源码写入令牌。Android 四项签名配置缺失时直接失败，不回退为不同签名的 debug 正式更新。沿用本地 outputs/signing 中已备份的 v1 签名材料，不重新生成密钥。
 
-上方描述的 Release Please 流程需要设置仓库变量 `ENABLE_RELEASE_PLEASE=true`，再开启下方权限。默认未启用，不影响标签自动发布。
+仓库设置 → 云原生构建需开启事件自动触发与定时任务。GitHub Actions 中加密的旧 Secrets 无法读回；Android 从现有本地备份迁移，Vercel 需使用有效部署令牌。
 
-## GitHub 一次性设置
+## 发布附件
 
-在 Settings → Actions → General 开启 **Allow GitHub Actions to create and approve pull requests**。工作流已声明所需的最小任务权限。
+- njustmap-android.apk：固定文件名的正式签名 APK，供 App 自动更新和官网下载。
+- 带版本号的 debug APK：仅调试。
+- 带版本号的 bundle.aab：正式签名 AAB。
+- njustmap-web.tar.gz：`.vercel/output`，含静态页、天气、教务与更新代理 Node 函数。
+- BUILD-INFO.txt、SHA256SUMS.txt：提交、签名模式和附件校验和。
 
-默认使用 `GITHUB_TOKEN`。它创建的版本 PR 不会自动触发另一个 CI 事件；版本 PR 合并到默认分支后仍会在 Release 流程中运行完整检查。若分支保护要求版本 PR 的 CI 必须先通过，可配置 `RELEASE_PLEASE_TOKEN`（受限到本仓库的 GitHub App token 或 fine-grained PAT，需 Contents、Pull requests、Issues 读写权限），或者在该 PR 分支上手动运行 CI。参见 [Release Please 官方说明](https://github.com/googleapis/release-please-action#other-actions-on-release-please-prs)。
+## 自动更新与旧版本过渡
 
-### Android 签名
+Android/iOS 原生 HTTP 读取 `https://cnb.cool/voidfun/njustmap/-/releases/latest`，请求头为 `Accept: application/vnd.cnb.api+json`。不要换成 api.cnb.cool：该开放 API 域名要求登录。Web 读取同站点 `/api/updates`，服务端访问 CNB 公开接口，解决浏览器 CORS 限制，不使用私密令牌。
 
-在 Settings → Secrets and variables → Actions 配置：
+启动后、回到前台和恢复网络时检查；成功间隔 6 小时、失败退避 5 分钟，保留手动检查。仅接受非草稿、非预发布、版本更高且固定 APK 附件已存在的发布；下载必须来自本仓库该版本。官网下载通过 `/api/updates?download=android` 跳转到验证后的 CNB APK。网络错误不会阻断地图。
 
-| Secret | 内容 |
-| --- | --- |
-| `ANDROID_KEYSTORE_BASE64` | 现有发布 keystore 的 Base64 内容 |
-| `ANDROID_KEYSTORE_PASSWORD` | keystore 密码 |
-| `ANDROID_KEY_ALIAS` | 签名 alias |
-| `ANDROID_KEY_PASSWORD` | alias 密码 |
+旧 v1.0.0/v1.1.0 已经把 GitHub 地址编入安装包，无法远程改写。需要在原 GitHub Release 发布一次相同签名的 v1.1.1 迁移 APK；用户通过原有更新弹窗安装后，后续更新全部访问 CNB。仅修改仓库网址不能让已安装旧版自动切源。
 
-四项齐全时自动构建正式 APK 和 AAB；部分配置时任务失败并要求补全。全部未配置时发布明确标注的 debug APK，用于体验。不同 runner 的 debug 签名不同，升级可能需要卸载旧版，正式分发应配置长期使用并安全备份的同一把密钥。不要把 keystore 或密码提交到 Git。
+## 官方参考
 
-Release 的 `njustmap-android.apk` 是官网使用的固定下载文件名。它按签名配置指向正式包或调试包；`BUILD-INFO.txt` 记录签名模式和提交 SHA。首次 Release 完成前该下载链接尚不可用。旧官网 APK 已移到本地 `outputs/android/legacy-download.apk`，没有删除原始产物。
-
-### 附件与恢复
-
-- `njustmap-web.tar.gz`：Vercel Build Output API 部署包（`.vercel/output`），含静态页面与 Node.js API，可用 `vercel deploy --prebuilt` 上传。
-- `njustmap-android.apk`：固定下载入口；另附带版本号的 debug APK，配置签名后附带 AAB。
-- `njustmap-ios-simulator.zip`：仅模拟器 App；不是可装到 iPhone 的 IPA。iPhone 签名分发见 [IOS.md](IOS.md)。
-- `BUILD-INFO.txt`、`SHA256SUMS.txt`：构建信息和全部附件校验和。
-
-若 Release 已创建但附件上传失败，在默认分支手动运行 **Release**，输入现有标签（如 `v0.1.1`）。流水线检出该标签，重建并检查版本一致性，然后补传附件；不会创建新版本。自动标签由 `GITHUB_TOKEN` 创建时，不依赖另一个 tag/release 事件触发，附件任务直接在同一工作流运行。
-
-Web 通过 Vercel Git 集成随 main 提交自动部署，详见 [VERCEL.md](VERCEL.md)。GitHub Release 不负责提交 App Store/Google Play。
-
-## App 更新检测（v1 起）
-
-根 package.json 版本同时嵌入 App 界面。启动 1.5 秒后自动读取 GitHub 最新正式 Release，回到前台或网络恢复时再次检查；成功检查间隔 6 小时，失败退避 5 分钟。「我的 → 应用更新」可立即手动重试。忽略草稿、预发布和比当前更旧的版本，只接受本仓库对应版本且已上传完成的固定 APK 附件；网络失败不会弹窗或阻断地图。选择稍后提醒后，同一版本在本次 App 会话内不再自动弹窗，手动检查仍可打开。
-
-Android 通过原生 HTTP 检查并在外部浏览器下载 APK，由系统确认安装；iOS/Web 展示发布页入口，iOS 模拟器包不会被作为 iPhone 更新包提供。公开读取不使用 GitHub 凭据；国内网络不可达时可以稍后重试。
-
-标签发布先创建草稿，上传所有附件后才公开并设为 latest，避免用户收到尚不可下载的更新。可在 docs/releases/vX.Y.Z.md 提供该版本的中文发布说明。手动恢复仍支持补传已有草稿或正式版本。
-
-v1 已配置固定 Android 发布签名。私钥和密码仅存本地忽略目录 outputs/signing 与加密的仓库 Actions Secrets，不可放进源码或公开附件。请安全备份本地签名材料；丢失或更换签名将影响后续覆盖升级。0.x debug 包迁移到 v1 前，应导出课表并记录个人设置。
+- [CNB 触发规则](https://docs.cnb.cool/zh/build/trigger-rule.html)
+- [CNB 密钥文件引用](https://docs.cnb.cool/zh/build/file-reference.html)
+- [CNB OpenAPI](https://api.cnb.cool/)
+- [Vercel 自定义 CI](https://vercel.com/kb/guide/using-vercel-cli-for-custom-workflows)

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.1
+
+- Migrate CI, Android releases, website deployment and update checks to CNB.
+- Keep the existing Android signing identity and validate assets before announcing updates.
+
 ## 1.1.0 (2026-09-13)
 
 - 日程导航保留指定起终点，新增单段路线预览与全天行程动画。

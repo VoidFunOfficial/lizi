@@ -12,12 +12,10 @@ function release(version = '1.2.0') {
     tag_name: `v${version}`,
     draft: false,
     prerelease: false,
-    html_url: `${RELEASE_ROOT}/tag/v${version}`,
     body: '改进导航与课表',
     assets: [
       {
         name: 'njustmap-android.apk',
-        state: 'uploaded',
         size: 1024,
         browser_download_url: `${RELEASE_ROOT}/download/v${version}/njustmap-android.apk`,
       },
@@ -46,11 +44,9 @@ void test('only offer published stable versions with an uploaded repository APK'
   assert.equal(parseRelease({ ...release(), draft: true }), null);
   assert.equal(parseRelease({ ...release(), prerelease: true }), null);
   assert.throws(() => parseRelease({ ...release(), assets: [] }));
-  assert.throws(() =>
-    parseRelease({ ...release(), html_url: 'https://evil.example' }),
-  );
+  assert.equal(parseRelease(release())?.url, `${RELEASE_ROOT}/tag/v1.2.0`);
   for (const patch of [
-    { state: 'new' },
+    { size: 1.5 },
     { size: 0 },
     { browser_download_url: 'javascript:alert(1)' },
     { name: 'njustmap-ios-simulator.zip' },

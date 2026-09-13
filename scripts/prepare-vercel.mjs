@@ -41,7 +41,7 @@ for (const file of [
 ]) {
   rmSync(join(output, 'public', file), { recursive: true, force: true });
 }
-for (const route of ['weather', 'student/jw']) {
+for (const route of ['weather', 'updates', 'student/jw']) {
   run(join(root, 'node_modules/.bin/esbuild'), [
     `app/api/${route}/route.ts`,
     '--bundle',

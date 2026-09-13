@@ -1,6 +1,7 @@
-export const RELEASE_ROOT = 'https://github.com/VoidFunOfficial/lizi/releases';
-export const RELEASE_API =
-  'https://api.github.com/repos/VoidFunOfficial/lizi/releases/latest';
+export const RELEASE_ROOT = 'https://cnb.cool/voidfun/njustmap/-/releases';
+// The public web endpoint accepts JSON; api.cnb.cool requires authentication.
+export const RELEASE_API = `${RELEASE_ROOT}/latest`;
+export const RELEASE_ACCEPT = 'application/vnd.cnb.api+json';
 export const CHECK_INTERVAL = 6 * 60 * 60 * 1000;
 export const RETRY_INTERVAL = 5 * 60 * 1000;
 
@@ -43,16 +44,15 @@ export function parseRelease(value: unknown): AppRelease | null {
   versionParts(version);
   const url = `${RELEASE_ROOT}/tag/v${version}`;
   const androidUrl = `${RELEASE_ROOT}/download/v${version}/njustmap-android.apk`;
-  if (data.html_url !== url || !Array.isArray(data.assets))
-    throw new Error('更新来源无效');
+  if (!Array.isArray(data.assets)) throw new Error('更新来源无效');
   // Do not offer a release until its installable artifact has finished uploading.
   const ready = data.assets.some((asset: unknown) => {
     if (!asset || typeof asset !== 'object') return false;
     const item = asset as Record<string, unknown>;
     return (
       item.name === 'njustmap-android.apk' &&
-      item.state === 'uploaded' &&
       typeof item.size === 'number' &&
+      Number.isSafeInteger(item.size) &&
       item.size > 0 &&
       item.browser_download_url === androidUrl
     );

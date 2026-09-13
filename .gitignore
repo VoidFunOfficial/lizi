@@ -37,6 +37,7 @@ next-env.d.ts
 /dist/
 /.wrangler/
 /outputs/
+/release-assets/
 /work/
 
 # Nested projects and local credentials

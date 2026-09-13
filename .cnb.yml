@@ -1,0 +1,53 @@
+# Main, other branches and tags are disjoint: $ is CNB's fallback rule.
+main:
+  push:
+    - &production
+      name: web-android-and-deploy
+      docker: &build-env
+        build: .cnb/Dockerfile
+      stages:
+        - &checks
+          name: Test and build Web and Android
+          script: bash scripts/cnb-ci.sh
+        - &artifacts
+          name: Upload build artifacts
+          image: cnbcool/attachments:latest
+          settings:
+            attachments: release-assets/*
+        - name: Deploy production Web
+          imports:
+            - https://cnb.cool/voidfun/njustmap-secrets/-/blob/main/vercel.yml
+          script: node scripts/cnb-deploy.mjs
+  pull_request: &ci
+    - name: web-android-ci
+      docker: *build-env
+      stages:
+        - *checks
+        - *artifacts
+  pull_request.update: *ci
+  web_trigger:
+    - *production
+  # Weekly regression checks replace the retired Actions-only Dependabot job.
+  "crontab: 0 9 * * 1": *ci
+
+$:
+  push: *ci
+  pull_request: *ci
+  pull_request.update: *ci
+  tag_push: &release
+    - name: publish-release
+      docker: *build-env
+      lock:
+        key: njustmap-release
+      stages:
+        - name: Validate release tag before building
+          script: node scripts/app-version.mjs "$CNB_BRANCH"
+        - *checks
+        - name: Build with the existing Android release key
+          imports:
+            - https://cnb.cool/voidfun/njustmap-secrets/-/blob/main/android.yml
+          script: node scripts/cnb-sign.mjs
+        - name: Publish verified assets and update latest
+          script: node scripts/cnb-release.mjs
+  # Select an existing vX.Y.Z tag in CNB to retry a failed release.
+  web_trigger: *release

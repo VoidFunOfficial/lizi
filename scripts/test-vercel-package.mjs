@@ -8,6 +8,7 @@ for (const file of [
   'public/app.html',
   'public/editor.html',
   'api/weather.js',
+  'api/updates.js',
   'api/student/jw.js',
 ]) {
   await access(new URL(file, output));

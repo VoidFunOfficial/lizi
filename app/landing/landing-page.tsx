@@ -659,7 +659,7 @@ export default function LandingPage() {
           </Reveal>
           <Reveal className={s.downloadCards}>
             <a
-              href="https://github.com/VoidFunOfficial/lizi/releases/latest/download/njustmap-android.apk"
+              href="/api/updates?download=android"
               download="NJustMap-Android.apk"
               className={`${s.downloadCard} ${s.androidCard}`}
             >
