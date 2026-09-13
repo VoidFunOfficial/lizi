@@ -218,6 +218,7 @@ export function createDailyPlan(
         place: Place | null;
         score: number;
         uncertain: boolean;
+        returnMinutes: number | null;
       } | null = null;
       for (let i = 0; i <= stops.length; i++) {
         const previous = stops[i - 1];
@@ -230,24 +231,54 @@ export function createDailyPlan(
         for (const place of dining.length ? dining : [null]) {
           const before = travel(from, place, gapStart);
           if (from && place && before === null) continue;
-          const start = Math.max(
-            gapStart + (before ?? 0),
+          const earliest = gapStart + (before ?? 0);
+          let start = Math.max(
+            earliest,
             Math.min(meal.preferred, gapEnd - preferences.mealMinutes),
           );
-          const after = travel(place, to, start + preferences.mealMinutes);
-          if (place && to && after === null) continue;
           const buffer =
             next?.kind === 'course' ? preferences.arrivalBuffer : 0;
-          if (start + preferences.mealMinutes + (after ?? 0) + buffer > gapEnd)
+          // Every meal includes a trip home before the next event. Reserve both
+          // legs when choosing its time and venue, rather than adding a detour later.
+          let back: number | null = null;
+          let onward: number | null = null;
+          for (let attempt = 0; attempt < 3; attempt++) {
+            back = travel(place, home, start + preferences.mealMinutes);
+            onward = next
+              ? travel(home, to, start + preferences.mealMinutes + (back ?? 0))
+              : 0;
+            const latest =
+              gapEnd -
+              preferences.mealMinutes -
+              (back ?? 0) -
+              (onward ?? 0) -
+              buffer;
+            if (start <= latest || latest < earliest) break;
+            start = latest;
+          }
+          if (
+            (place && home && back === null) ||
+            (next && home && to && onward === null)
+          )
+            continue;
+          if (
+            start +
+              preferences.mealMinutes +
+              (back ?? 0) +
+              (onward ?? 0) +
+              buffer >
+            gapEnd
+          )
             continue;
           const uncertain =
-            !place || !from || Boolean(next && !next.online && !to);
+            !place || !from || !home || Boolean(next && !next.online && !to);
           const score =
             (before ?? 0) +
-            (after ?? 0) +
+            (back ?? 0) +
+            (onward ?? 0) +
             Math.abs(start - meal.preferred) * 0.2;
           if (!best || score < best.score)
-            best = { start, place, score, uncertain };
+            best = { start, place, score, uncertain, returnMinutes: back };
         }
       }
       if (best) {
@@ -263,6 +294,18 @@ export function createDailyPlan(
             ? ['地点未完善，用餐时间暂未计入完整步行时间']
             : [],
         });
+        const homeArrival =
+          best.start + preferences.mealMinutes + (best.returnMinutes ?? 0);
+        stops.push({
+          id: `return-home-${meal.title}`,
+          kind: 'home',
+          title: `${meal.title}后回寝室`,
+          detail: home?.name ?? '请设置寝室',
+          start: homeArrival,
+          end: homeArrival,
+          place: home,
+          warnings: best.returnMinutes === null ? ['返程时间待确认'] : [],
+        });
         stops.sort((a, b) => a.start - b.start);
       } else
         warnings.push(
@@ -271,7 +314,7 @@ export function createDailyPlan(
     }
   }
   // Return home after the final event. No invented walking duration for unknown endpoints.
-  if (stops.length && home) {
+  if (stops.length && home && lastPhysical(stops)?.id !== home.id) {
     const last = stops.at(-1)!;
     const from = lastPhysical(stops);
     const duration = travel(from, home, last.end);
@@ -290,9 +333,10 @@ export function createDailyPlan(
   let from = home;
   let available = 0;
   for (const stop of stops) {
-    // A meal without a chosen venue only reserves time; it cannot relocate the
-    // student to an unknown point and break otherwise resolved classroom routes.
+    // Unknown meal locations cannot produce a walking route home. The explicit
+    // home stop restores a known origin for the next scheduled trip.
     if (stop.online || (stop.kind === 'meal' && !stop.place)) {
+      if (!stop.online) from = null;
       available = Math.max(available, stop.end);
       continue;
     }

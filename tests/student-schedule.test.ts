@@ -366,6 +366,14 @@ void test('daily plan uses actual network routes, avoids course times and return
           meal.end <= courseTime(c).start || meal.start >= courseTime(c).end,
       ),
     );
+    const back = plan.stops[plan.stops.indexOf(meal) + 1];
+    assert.equal(back.kind, 'home');
+    assert.equal(back.place?.id, 'home');
+    const returnLeg = plan.legs.find((leg) => leg.destinationId === back.id)!;
+    assert.equal(returnLeg.from, meal.place?.name);
+    assert.equal(returnLeg.to, '宿舍');
+    assert.equal(returnLeg.departure, meal.end);
+    assert.ok(returnLeg.route);
   }
   assert.equal(plan.stops.at(-1)?.kind, 'home');
   assert.ok(plan.legs.filter((leg) => leg.route).length >= 4);
@@ -378,7 +386,71 @@ void test('daily plan uses actual network routes, avoids course times and return
     const leg = plan.legs.find((l) => l.destinationId === stop.id)!;
     assert.ok(leg.arrival <= stop.start - 10);
     assert.ok(leg.route?.geometry.length);
+    assert.equal(leg.from, '宿舍');
   }
+  assert.equal(
+    plan.stops.filter((stop) => stop.kind === 'home').length,
+    3,
+    'do not duplicate the final return after dinner',
+  );
+});
+
+void test('breakfast moves earlier to fit the return home and onward trip before class', () => {
+  const map = campus();
+  const first = course({ startPeriod: 1, endPeriod: 3 });
+  const plan = createDailyPlan(
+    {
+      courses: [first],
+      activities: [],
+      week: 4,
+      reason: null,
+      referenceDate: '2026-09-14',
+    },
+    '2026-09-14',
+    map.places,
+    compileCampusMap(map),
+    {
+      ...DEFAULT_PREFERENCES,
+      homeId: 'home',
+      diningIds: ['dining'],
+      breakfast: '07:30',
+      locationBindings: { 教学楼A101: 'class' },
+    },
+  );
+  const breakfast = plan.stops.find((stop) => stop.title === '早餐')!;
+  const back = plan.legs.find(
+    (leg) => leg.destinationId === 'return-home-早餐',
+  )!;
+  const toClass = plan.legs.find((leg) => leg.destinationId === first.id)!;
+  assert.ok(breakfast.start < 7 * 60 + 30);
+  assert.ok(back.route && toClass.route);
+  assert.equal(back.departure, breakfast.end);
+  assert.ok(toClass.departure >= back.arrival);
+  assert.ok(toClass.arrival <= 8 * 60 - 10);
+});
+
+void test('meal selection rejects a venue when its required trip home is unreachable', () => {
+  const map = campus();
+  map.links[0].direction = 'forward';
+  const plan = createDailyPlan(
+    {
+      courses: [],
+      activities: [],
+      week: 4,
+      reason: null,
+      referenceDate: '2026-09-14',
+    },
+    '2026-09-14',
+    map.places,
+    compileCampusMap(map),
+    {
+      ...DEFAULT_PREFERENCES,
+      homeId: 'home',
+      diningIds: ['dining'],
+    },
+  );
+  assert.equal(plan.stops.filter((stop) => stop.kind === 'meal').length, 0);
+  assert.equal(plan.warnings.length, 3);
 });
 void test('unknown and unreachable endpoints remain explicit, online classes do not generate walking', () => {
   const map = campus();

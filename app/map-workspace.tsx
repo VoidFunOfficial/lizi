@@ -41,6 +41,7 @@ import { Capacitor, CapacitorHttp } from '@capacitor/core';
 import { Geolocation } from '@capacitor/geolocation';
 import {
   useCallback,
+  useLayoutEffect,
   useEffect,
   useMemo,
   useRef,
@@ -55,11 +56,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ShadowInspector } from './shadow-inspector';
 import StudentHub, { type StudentTab } from './app/student/student-hub';
+import {
+  RoutePreviewControls,
+  useRoutePreview,
+} from './app/student/route-preview';
 import { useNavigationSheet } from './app/use-navigation-sheet';
 import { useDeviceHeading } from './app/use-device-heading';
 import { headingLabel, headingOnMap } from '@/lib/device-heading';
 import type { PlanLeg } from '@/lib/student/planner';
 import { timeLabel } from '@/lib/student/calendar';
+import { dailyPreviewLegs } from '@/lib/student/route-preview';
 import georectification from '@/data/campus-guide-georectification.json';
 import {
   createFeatureId,
@@ -1325,11 +1331,13 @@ export default function Home({
 }: HomeProps = {}) {
   const [mode, setMode] = useState<AppMode>(initialMode);
   const [studentTab, setStudentTab] = useState<StudentTab>('map');
+  const preview = useRoutePreview(studentTab === 'map');
   const [navigationSession, setNavigationSession] = useState<{
     route: CampusRoute;
     destination: string;
     origin: string;
     originLevelId: string;
+    followLocation: boolean;
   } | null>(null);
   const [navigationSheetOpen, setNavigationSheetOpen] = useState(true);
   const navigationResumeRef = useRef<HTMLButtonElement>(null);
@@ -1466,11 +1474,12 @@ export default function Home({
     }),
     [calibrationAnchorCount, document],
   );
-  const activeRoute =
-    navigationSession?.route ??
-    alternatives.find((alternative) => alternative.profile === activeProfile)
-      ?.route ??
-    null;
+  const activeRoute = preview.session
+    ? (preview.leg?.route ?? null)
+    : (navigationSession?.route ??
+      alternatives.find((alternative) => alternative.profile === activeProfile)
+        ?.route ??
+      null);
   const routeSegments = activeRoute
     ? splitRouteByLevel(activeRoute.geometry, currentLevelId)
     : [];
@@ -1721,11 +1730,15 @@ export default function Home({
   );
 
   const focusMapPoint = useCallback(
-    (point: MapPoint, behavior: ScrollBehavior = 'smooth') => {
+    (
+      point: MapPoint,
+      behavior: ScrollBehavior = 'smooth',
+      immediate = false,
+    ) => {
       if (focusFrameRef.current !== null) {
         window.cancelAnimationFrame(focusFrameRef.current);
       }
-      focusFrameRef.current = window.requestAnimationFrame(() => {
+      const focus = () => {
         focusFrameRef.current = null;
         const scroller = mapScrollRef.current;
         const stage = mapStageRef.current;
@@ -1744,9 +1757,13 @@ export default function Home({
             shell.getAttribute('data-place-selected') === 'true'
               ? '.place-action-sheet'
               : '.left-panel';
-          for (const selector of [sheet, '.student-tab-bar']) {
+          for (const selector of [
+            sheet,
+            '.route-preview-panel',
+            '.student-tab-bar',
+          ]) {
             const rect = shell.querySelector(selector)?.getBoundingClientRect();
-            if (rect)
+            if (rect && rect.height > 0)
               visibleBottom = Math.min(
                 visibleBottom,
                 rect.top - bounds.top - 12,
@@ -1763,7 +1780,9 @@ export default function Home({
             ? 'auto'
             : behavior,
         });
-      });
+      };
+      if (immediate) focus();
+      else focusFrameRef.current = window.requestAnimationFrame(focus);
     },
     [appView],
   );
@@ -1930,7 +1949,7 @@ export default function Home({
   ]);
 
   const selectAppPlace = (placeId: string) => {
-    if (!appView) return;
+    if (!appView || preview.session) return;
     if (navigationSession) {
       setNavigationSheetOpen(true);
       setNotice('正在导航中，结束后可选择新的目的地');
@@ -2603,6 +2622,7 @@ export default function Home({
           route: preferred.route,
           destination: destinationName,
           origin: startInput,
+          followLocation: true,
           originLevelId: preferred.route.geometry[0]?.levelId ?? currentLevelId,
         });
         if (!locationTracking) locate();
@@ -2619,8 +2639,10 @@ export default function Home({
   };
 
   // Depend on the fixed navigation target, not the route replaced by each fix.
-  // Map browsing and sheet visibility must not affect the user's route origin.
-  const navigationDestination = navigationSession?.destination;
+  // Only live navigation follows GPS. Scheduled legs keep their planned origin.
+  const navigationDestination = navigationSession?.followLocation
+    ? navigationSession.destination
+    : undefined;
   const navigationOriginLevelId = navigationSession?.originLevelId;
   useEffect(() => {
     if (!navigationDestination || !navigationOriginLevelId || !geoPosition)
@@ -2718,6 +2740,7 @@ export default function Home({
       route: leg.route,
       destination: leg.to,
       origin: leg.from,
+      followLocation: false,
       originLevelId: leg.route.geometry[0]?.levelId ?? currentLevelId,
     });
     if (!locationTracking) locate();
@@ -2734,6 +2757,39 @@ export default function Home({
     const point = leg.route.geometry[0];
     if (point) window.requestAnimationFrame(() => focusMapPoint(point));
   };
+
+  const openRoutePreview = (
+    legs: PlanLeg[],
+    date: string,
+    wholeDay = false,
+  ) => {
+    if (!legs.length) return;
+    preview.open(legs, date, wholeDay);
+    setSelectedPlaceId(null);
+    setStudentTab('map');
+    setZoom(APP_NAVIGATION_ZOOM);
+  };
+  const previewX = preview.point?.x;
+  const previewY = preview.point?.y;
+  const previewLevel = preview.point?.levelId;
+  // Keep camera scrolling in the same paint as the marker update. Deferring it
+  // by another frame makes the marker jump ahead and then snap back on screen.
+  useLayoutEffect(() => {
+    if (
+      studentTab !== 'map' ||
+      previewX === undefined ||
+      previewY === undefined
+    )
+      return;
+    focusMapPoint({ x: previewX, y: previewY }, 'instant', true);
+  }, [studentTab, previewX, previewY, focusMapPoint]);
+  useEffect(() => {
+    if (studentTab !== 'map' || !previewLevel) return;
+    const frame = window.requestAnimationFrame(() =>
+      setCurrentLevelId(previewLevel),
+    );
+    return () => window.cancelAnimationFrame(frame);
+  }, [studentTab, previewLevel]);
 
   const endNavigation = () => {
     setNavigationSession(null);
@@ -2796,6 +2852,7 @@ export default function Home({
       data-app-view={appView}
       data-navigation-active={Boolean(activeRoute)}
       data-navigation-session={Boolean(navigationSession)}
+      data-route-preview={Boolean(preview.session)}
       data-navigation-sheet-open={navigationSheetOpen}
       data-place-selected={Boolean(selectedPlace)}
       data-student-tab={appView ? studentTab : undefined}
@@ -3756,6 +3813,21 @@ export default function Home({
                     })}
                   </g>
                 )}
+                {preview.session?.wholeDay && (
+                  <g className="preview-day-routes" aria-hidden="true">
+                    {preview.session.legs.flatMap((leg) =>
+                      splitRouteByLevel(
+                        leg.route?.geometry ?? [],
+                        currentLevelId,
+                      ).map((segment, index) => (
+                        <polyline
+                          key={`${leg.id}-${index}`}
+                          points={pointsAttribute(segment)}
+                        />
+                      )),
+                    )}
+                  </g>
+                )}
                 {routeSegments.length > 0 && (
                   <g className="active-route">
                     {routeSegments.map((segment, index) => (
@@ -3971,6 +4043,15 @@ export default function Home({
                       cx={geoPosition.x * MAP_WIDTH}
                       cy={geoPosition.y * MAP_HEIGHT}
                       r="5"
+                    />
+                  </g>
+                )}
+                {preview.point?.levelId === currentLevelId && (
+                  <g className="preview-walker" aria-label="预览行进位置">
+                    <circle
+                      cx={preview.point.x * MAP_WIDTH}
+                      cy={preview.point.y * MAP_HEIGHT}
+                      r="13"
                     />
                   </g>
                 )}
@@ -4221,6 +4302,7 @@ export default function Home({
       </section>
       {appView &&
         studentTab === 'map' &&
+        !preview.session &&
         !selectedPlace &&
         (navigationSession || !navigationSheetOpen) && (
           <div
@@ -4271,13 +4353,29 @@ export default function Home({
             )}
           </div>
         )}
+      {appView && studentTab === 'map' && preview.session && (
+        <RoutePreviewControls
+          preview={preview}
+          onClose={() => {
+            preview.close();
+            setStudentTab('today');
+          }}
+        />
+      )}
       {appView && (
         <StudentHub
           tab={studentTab}
           onTabChange={setStudentTab}
           places={places}
           navigator={campusNavigator}
-          onNavigate={showPlannedRoute}
+          onNavigate={(leg, date) => {
+            preview.close();
+            showPlannedRoute(leg, date);
+          }}
+          onPreview={(leg, date) => openRoutePreview([leg], date)}
+          onPreviewDay={(plan, date) =>
+            openRoutePreview(dailyPreviewLegs(plan), date, true)
+          }
         />
       )}
     </main>

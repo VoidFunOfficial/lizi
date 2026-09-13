@@ -50,6 +50,7 @@ import {
   createDailyPlan,
   resolveCoursePlace,
   type PlanLeg,
+  type DailyPlan,
   type PlannerPreferences,
 } from '@/lib/student/planner';
 import {
@@ -75,6 +76,8 @@ type Props = {
   places: Place[];
   navigator: CampusNavigator;
   onNavigate: (leg: PlanLeg, date: string) => void;
+  onPreview: (leg: PlanLeg, date: string) => void;
+  onPreviewDay: (plan: DailyPlan, date: string) => void;
 };
 const TABS = [
   { id: 'map', title: '地图', icon: Map },
@@ -103,6 +106,8 @@ export default function StudentHub({
   places,
   navigator,
   onNavigate,
+  onPreview,
+  onPreviewDay,
 }: Props) {
   const [data, setData] = useState<StudentData>(emptyStudentData);
   const [loaded, setLoaded] = useState(false);
@@ -932,13 +937,23 @@ export default function StudentHub({
                                             ? ''
                                             : ` · ${Math.round(leg.route.metrics.distanceMeters)} 米`}
                                         </small>
-                                        <button
-                                          onClick={() => onNavigate(leg, date)}
-                                        >
-                                          <Navigation size={14} />
-                                          导航
-                                          <ArrowRight size={14} />
-                                        </button>
+                                        <div className="student-leg-actions">
+                                          <button
+                                            onClick={() => onPreview(leg, date)}
+                                          >
+                                            <Route size={14} />
+                                            路线预览
+                                          </button>
+                                          <button
+                                            onClick={() =>
+                                              onNavigate(leg, date)
+                                            }
+                                          >
+                                            <Navigation size={14} />
+                                            导航
+                                            <ArrowRight size={14} />
+                                          </button>
+                                        </div>
                                       </>
                                     ) : (
                                       <small>{leg.message}</small>
@@ -950,6 +965,17 @@ export default function StudentHub({
                         );
                       })}
                     </div>
+                    {plan.stops.length > 0 && (
+                      <div className="student-day-preview">
+                        <button
+                          className="student-secondary"
+                          onClick={() => onPreviewDay(plan, date)}
+                        >
+                          <Route size={17} />
+                          全天路程预览
+                        </button>
+                      </div>
+                    )}
                     {!plan.stops.length && (
                       <div className="student-empty">
                         <CalendarDays size={32} />
@@ -975,7 +1001,6 @@ export default function StudentHub({
 
                 {tab === 'profile' && (
                   <>
-                    <UpdateSettings />
                     <details className="student-card student-settings">
                       <summary>
                         <span className="student-setting-icon">
@@ -1407,6 +1432,37 @@ export default function StudentHub({
                         </div>
                       </>
                     )}
+                    <section
+                      className="student-card student-author"
+                      aria-label="关注作者 v0idfun"
+                    >
+                      <div className="student-author-heading">
+                        <span className="student-setting-icon">
+                          <UserRound size={19} />
+                        </span>
+                        <strong>关注作者</strong>
+                        <span className="student-setting-value">v0idfun</span>
+                      </div>
+                      <a
+                        href="https://space.bilibili.com/678915971"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="在 B 站关注 v0idfun（新窗口打开）"
+                      >
+                        <span>B 站</span>
+                        <ChevronRight size={17} aria-hidden="true" />
+                      </a>
+                      <a
+                        href="https://www.douyin.com/user/MS4wLjABAAAAAeGB_AxY-81nWT7Z1VMZ1NYxvdXgDGHakp22MroYIibaBnnQ3NFaUyxMbgC5hB6t"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="在抖音关注 v0idfun（新窗口打开）"
+                      >
+                        <span>抖音</span>
+                        <ChevronRight size={17} aria-hidden="true" />
+                      </a>
+                    </section>
+                    <UpdateSettings />
                   </>
                 )}
               </>

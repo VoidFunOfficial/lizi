@@ -385,6 +385,41 @@
 .student-settings-body {
   padding: 0 18px 20px;
 }
+.student-author {
+  padding: 0;
+  overflow: hidden;
+}
+.student-author-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 12px 16px;
+  font-size: 0.9375rem;
+}
+.student-author-heading strong {
+  font-weight: 450;
+}
+.student-author > a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 48px;
+  margin-left: 60px;
+  padding: 10px 16px 10px 0;
+  border-top: 1px solid var(--student-line);
+  color: var(--student-blue);
+  font-size: 0.9375rem;
+  text-decoration: none;
+}
+.student-author > a:hover,
+.student-author > a:active {
+  background: var(--student-fill);
+}
+.student-author > a:focus-visible {
+  outline: 2px solid var(--student-blue);
+  outline-offset: -3px;
+}
 .student-field {
   display: flex;
   flex-direction: column;
@@ -943,7 +978,7 @@
   font-size: 0.75rem;
   line-height: 1.6;
 }
-.student-leg > button {
+.student-leg-actions > button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1060,7 +1095,7 @@
   .student-date-picker > .student-today-button,
   .student-soft-icon,
   .student-avatar,
-  .student-leg > button,
+  .student-leg-actions > button,
   .student-pill {
     background: #152c49;
     color: #6bb0ff;
@@ -1171,4 +1206,102 @@
 .student-jw-status {
   font-size: 12px;
   color: var(--student-secondary);
+}
+
+.student-leg-actions {
+  display: flex;
+  gap: 8px;
+}
+.student-leg-actions > button {
+  flex: 1;
+  min-width: 0;
+}
+.student-day-preview {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 20px;
+}
+.route-preview-panel {
+  position: absolute;
+  z-index: 29;
+  left: max(16px, env(safe-area-inset-left, 0px));
+  bottom: var(--student-bottom-space);
+  width: min(370px, calc(100vw - 32px));
+  box-sizing: border-box;
+  padding: 16px;
+  border-radius: 24px;
+  color: var(--app-text, #1c1c1e);
+  background: var(--app-material-strong);
+  box-shadow: 0 12px 36px rgb(23 25 22 / 0.18);
+  backdrop-filter: blur(30px);
+}
+.route-preview-heading,
+.route-preview-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+.route-preview-panel button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  min-width: 40px;
+  border: 0;
+  border-radius: 12px;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+.route-preview-panel button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.route-preview-panel button:focus-visible {
+  outline: 2px solid #007aff;
+}
+.route-preview-panel small,
+.route-preview-leg span {
+  font-size: 12px;
+  opacity: 0.7;
+}
+.route-preview-leg {
+  display: grid;
+  gap: 5px;
+  margin: 12px 0;
+}
+.route-preview-leg strong {
+  overflow-wrap: anywhere;
+}
+.route-preview-panel progress {
+  width: 100%;
+  height: 4px;
+  accent-color: #007aff;
+}
+.route-preview-actions {
+  margin-top: 8px;
+  font-size: 13px;
+}
+.preview-day-routes polyline {
+  fill: none;
+  stroke: #647fa4;
+  stroke-width: 7;
+  stroke-opacity: 0.35;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.preview-walker {
+  pointer-events: none;
+}
+.preview-walker circle {
+  fill: #007aff;
+  stroke: white;
+  stroke-width: 5;
+  filter: drop-shadow(0 2px 4px #0006);
+}
+.app-shell.is-app-view[data-route-preview='true'] .left-panel {
+  display: none !important;
+  pointer-events: none;
 }

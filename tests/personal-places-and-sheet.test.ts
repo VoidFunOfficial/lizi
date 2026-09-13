@@ -75,7 +75,10 @@ void test('legacy invalid selections cannot become a home or meal destination', 
     compileCampusMap(map),
     { ...preferences, diningIds: [library.id] },
   );
-  assert.equal(plan.stops.filter((s) => s.kind === 'home').length, 0);
+  const returns = plan.stops.filter((s) => s.kind === 'home');
+  assert.equal(returns.length, 3);
+  assert.ok(returns.every((s) => !s.place && s.detail === '请设置寝室'));
+  assert.ok(plan.legs.every((leg) => !leg.route));
   assert.ok(plan.stops.filter((s) => s.kind === 'meal').every((s) => !s.place));
   assert.ok(plan.warnings.some((s) => s.includes('设置寝室')));
 });
