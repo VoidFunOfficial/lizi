@@ -61,6 +61,7 @@ import {
 } from '@/lib/student/storage';
 import './student.css';
 import JwImport from './jw-import';
+import { UpdateSettings } from '../updates/app-updates';
 import {
   allowedPersonalPlaces,
   diningLabel,
@@ -974,6 +975,7 @@ export default function StudentHub({
 
                 {tab === 'profile' && (
                   <>
+                    <UpdateSettings />
                     <details className="student-card student-settings">
                       <summary>
                         <span className="student-setting-icon">

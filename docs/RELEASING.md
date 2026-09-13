@@ -67,3 +67,13 @@ Release 的 `njustmap-android.apk` 是官网使用的固定下载文件名。它
 若 Release 已创建但附件上传失败，在默认分支手动运行 **Release**，输入现有标签（如 `v0.1.1`）。流水线检出该标签，重建并检查版本一致性，然后补传附件；不会创建新版本。自动标签由 `GITHUB_TOKEN` 创建时，不依赖另一个 tag/release 事件触发，附件任务直接在同一工作流运行。
 
 Web 通过 Vercel Git 集成随 main 提交自动部署，详见 [VERCEL.md](VERCEL.md)。GitHub Release 不负责提交 App Store/Google Play。
+
+## App 更新检测（v1 起）
+
+根 package.json 版本同时嵌入 App 界面。启动 1.5 秒后自动读取 GitHub 最新正式 Release，回到前台或网络恢复时再次检查；成功检查间隔 6 小时，失败退避 5 分钟。「我的 → 应用更新」可立即手动重试。忽略草稿、预发布和比当前更旧的版本，只接受本仓库对应版本且已上传完成的固定 APK 附件；网络失败不会弹窗或阻断地图。选择稍后提醒后，同一版本在本次 App 会话内不再自动弹窗，手动检查仍可打开。
+
+Android 通过原生 HTTP 检查并在外部浏览器下载 APK，由系统确认安装；iOS/Web 展示发布页入口，iOS 模拟器包不会被作为 iPhone 更新包提供。公开读取不使用 GitHub 凭据；国内网络不可达时可以稍后重试。
+
+标签发布先创建草稿，上传所有附件后才公开并设为 latest，避免用户收到尚不可下载的更新。可在 docs/releases/vX.Y.Z.md 提供该版本的中文发布说明。手动恢复仍支持补传已有草稿或正式版本。
+
+v1 已配置固定 Android 发布签名。私钥和密码仅存本地忽略目录 outputs/signing 与加密的仓库 Actions Secrets，不可放进源码或公开附件。请安全备份本地签名材料；丢失或更换签名将影响后续覆盖升级。0.x debug 包迁移到 v1 前，应导出课表并记录个人设置。

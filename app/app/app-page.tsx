@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 import Home from '../map-workspace';
+import { AppUpdates } from './updates/app-updates';
 
 type SplashPhase = 'visible' | 'leaving' | 'hidden';
 
@@ -31,7 +32,9 @@ export default function AppPage() {
 
   return (
     <>
-      <Home initialMode="navigate" appView />
+      <AppUpdates>
+        <Home initialMode="navigate" appView />
+      </AppUpdates>
       {splashPhase !== 'hidden' && (
         <output
           className={`app-loading-screen ${splashPhase === 'leaving' ? 'is-leaving' : ''}`}

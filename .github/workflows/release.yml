@@ -60,7 +60,11 @@ jobs:
         run: |
           node scripts/app-version.mjs "$RELEASE_TAG"
           if ! gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
-            gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --generate-notes --title "$RELEASE_TAG"
+            if [[ -f "docs/releases/$RELEASE_TAG.md" ]]; then
+              gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --draft --notes-file "docs/releases/$RELEASE_TAG.md" --title "$RELEASE_TAG"
+            else
+              gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --draft --generate-notes --title "$RELEASE_TAG"
+            fi
           fi
           echo 'released=true' >> "$GITHUB_OUTPUT"
           echo "tag=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
@@ -148,6 +152,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release upload "$RELEASE_TAG" release-assets/* --repo "$GITHUB_REPOSITORY" --clobber
+      - name: Publish only after all assets are uploaded
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --draft=false --latest
       - name: Remove temporary signing key
         if: always()
         run: rm -f "$RUNNER_TEMP/release.jks"
