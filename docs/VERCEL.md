@@ -27,3 +27,7 @@ node scripts/test-vercel-package.mjs
 官网 Android 下载指向 GitHub Release。在首次版本标签成功发布前，下载附件尚不存在。
 
 参考：[Vercel GitHub 集成](https://vercel.com/docs/git/vercel-for-github)、[Node.js Functions](https://vercel.com/docs/functions/runtimes/node-js)。
+
+## 页面跳转验收
+
+静态页面之间使用原生 `<a href>` 跳转。当前 Vinext 版本的 `next/link` 在生产构建中可能因客户端导航函数缺失而报错，导致官网 Web 入口无响应。部署后必须在浏览器从官网点击 Web 入口，再检查地图、课表等交互；仅检查 HTML HTTP 200 不足以证明页面可用。

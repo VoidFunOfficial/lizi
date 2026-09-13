@@ -1,7 +1,8 @@
 'use client';
 
+/* eslint-disable next/no-html-link-for-pages -- Native document navigation avoids the broken Vinext production Link runtime. */
+
 import { ArrowLeft, Building2, Clock3, Moon, Sun } from 'lucide-react';
-import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 
 import {
@@ -113,10 +114,10 @@ export default function DebugSunshinePage() {
             <h1>晴天建筑阴影模拟</h1>
           </div>
         </div>
-        <Link className={styles.backLink} href="/editor">
+        <a className={styles.backLink} href="/editor">
           <ArrowLeft />
           <span>返回导航</span>
-        </Link>
+        </a>
       </header>
 
       <section className={styles.mapPanel} aria-label="校园晴天阴影预览">
@@ -255,7 +256,7 @@ export default function DebugSunshinePage() {
               (buildings.length
                 ? '使用地图编辑器中保存的矩形与建筑高度'
                 : '尚未添加阴影建筑，旧建筑预设已清空')}{' '}
-            · <Link href="/editor">添加或编辑阴影</Link>
+            · <a href="/editor">添加或编辑阴影</a>
           </span>
         </div>
       </section>

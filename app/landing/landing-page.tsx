@@ -1,7 +1,8 @@
 'use client';
 
+/* eslint-disable next/no-html-link-for-pages -- Native document navigation avoids the broken Vinext production Link runtime. */
+
 import Image from 'next/image';
-import Link from 'next/link';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import {
   ArrowDown,
@@ -255,9 +256,9 @@ export default function LandingPage() {
             <a href="#everyday">校园日常</a>
             <a href="#download">下载 App</a>
           </div>
-          <Link className={s.navCta} href="/app">
+          <a className={s.navCta} href="/app">
             打开 Web 版 <ArrowUpRight size={14} />
-          </Link>
+          </a>
         </nav>
         <div className={s.progress} />
       </header>
@@ -282,9 +283,9 @@ export default function LandingPage() {
               <a className={s.primary} href="#download">
                 获取 NJustMap <ArrowDownToLine size={17} />
               </a>
-              <Link className={s.textLink} href="/app">
+              <a className={s.textLink} href="/app">
                 直接使用 Web 版 <ArrowUpRight size={17} />
-              </Link>
+              </a>
             </div>
             <div className={s.availability}>
               <span>Android 已可下载</span>
@@ -355,23 +356,23 @@ export default function LandingPage() {
               <span>今天，想去哪里？</span>
               <span className={s.searchHint}>探索校园</span>
             </div>
-            <Link className={`${s.placePin} ${s.pinLibrary}`} href="/app">
+            <a className={`${s.placePin} ${s.pinLibrary}`} href="/app">
               <MapPin size={18} />
               <span>图书馆</span>
               <ChevronRight size={14} />
-            </Link>
-            <Link className={`${s.placePin} ${s.pinFood}`} href="/app">
+            </a>
+            <a className={`${s.placePin} ${s.pinFood}`} href="/app">
               <MapPin size={18} />
               <span>食堂</span>
               <ChevronRight size={14} />
-            </Link>
+            </a>
             <div className={s.mapBottom}>
               <span>
                 <span className={s.statusDot} /> 南京理工大学 · 江阴校区
               </span>
-              <Link href="/app">
+              <a href="/app">
                 展开你的地图 <ArrowUpRight size={16} />
-              </Link>
+              </a>
             </div>
           </Reveal>
         </section>
@@ -408,9 +409,9 @@ export default function LandingPage() {
                 <h3>{route.title}</h3>
                 <p>{route.text}</p>
               </div>
-              <Link className={s.textLink} href="/app">
+              <a className={s.textLink} href="/app">
                 规划我的路线 <ArrowUpRight size={17} />
-              </Link>
+              </a>
             </div>
             <div
               className={s.routeArt}
@@ -527,9 +528,9 @@ export default function LandingPage() {
               <br />
               都清清楚楚。
             </p>
-            <Link className={s.textLink} href="/app">
+            <a className={s.textLink} href="/app">
               打开我的校园日常 <ArrowUpRight size={17} />
-            </Link>
+            </a>
             <div className={s.dayDetails}>
               <span>
                 <Check size={16} /> 教务课表导入
@@ -610,9 +611,9 @@ export default function LandingPage() {
                   <Sun size={38} />
                   <strong>把今天，留给自己。</strong>
                   <span>示例课表中，这一天没有课程。</span>
-                  <Link href="/app">
+                  <a href="/app">
                     去校园走走 <ArrowUpRight size={16} />
-                  </Link>
+                  </a>
                 </div>
               )}
             </div>
@@ -687,7 +688,7 @@ export default function LandingPage() {
               </span>
               <small>iPhone 用户可先使用 Web 版</small>
             </div>
-            <Link href="/app" className={s.downloadCard}>
+            <a href="/app" className={s.downloadCard}>
               <Globe2 size={30} strokeWidth={1.5} />
               <span className={s.platform}>Web</span>
               <span className={s.platformDesc}>无需安装，即刻出发。</span>
@@ -695,7 +696,7 @@ export default function LandingPage() {
                 打开 Web 版 <ArrowUpRight size={19} />
               </span>
               <small>手机、平板与电脑浏览器</small>
-            </Link>
+            </a>
           </Reveal>
         </section>
       </main>
@@ -707,9 +708,9 @@ export default function LandingPage() {
         <span>少一点摸索，多一点从容。</span>
         <div>
           <span>为南京理工大学江阴校区打造</span>
-          <Link href="/editor">
+          <a href="/editor">
             地图编辑器 <ArrowUpRight size={12} />
-          </Link>
+          </a>
         </div>
       </footer>
     </div>
