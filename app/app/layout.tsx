@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 export const dynamic = 'force-static';
 
 export const metadata: Metadata = {
-  title: 'NJUST 校园导航',
+  title: '南梨有梨',
   description: '南京理工大学江阴校区校园步行导航',
 };
 

@@ -2864,7 +2864,7 @@ export default function Home({
               <Navigation />
             </div>
             <div>
-              <strong>{appView ? 'NJUST 校园导航' : '校园步行导航'}</strong>
+              <strong>{appView ? '南梨有梨' : '校园步行导航'}</strong>
               <span>
                 {appView ? '江阴校区 · 校园导览' : 'NJUST · 混合通行网络 v2'}
               </span>

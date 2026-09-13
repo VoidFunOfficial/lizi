@@ -104,7 +104,7 @@ export function AppUpdates({ children }: { children: ReactNode }) {
             <div className="app-update-icon">
               <ArrowUpCircle size={30} />
             </div>
-            <p className="app-update-eyebrow">NJUST 校园导航</p>
+            <p className="app-update-eyebrow">南梨有梨</p>
             <h2 id="app-update-title">发现新版本</h2>
             <p className="app-update-version">
               v{version} <span>→</span> v{release.version}

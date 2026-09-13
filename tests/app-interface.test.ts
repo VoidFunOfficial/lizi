@@ -4,7 +4,7 @@ import test from 'node:test';
 
 const projectRoot = new URL('../', import.meta.url);
 
-void test('/app uses the transparent crest and navigation-only app view', async () => {
+void test('/app uses the brand icon and navigation-only app view', async () => {
   const [routeSource, routeClientSource, homeSource, styles] =
     await Promise.all([
       readFile(new URL('app/app/page.tsx', projectRoot), 'utf8'),
@@ -14,7 +14,7 @@ void test('/app uses the transparent crest and navigation-only app view', async 
     ]);
 
   assert.match(routeSource, /dynamic = 'force-static'/);
-  assert.match(routeClientSource, /src="\/icon-sc-transparent\.png"/);
+  assert.match(routeClientSource, /src="\/icon\.png"/);
   assert.match(routeClientSource, /initialMode="navigate" appView/);
   assert.match(routeClientSource, /app-loading-fill/);
   assert.match(homeSource, /appView \? 'is-app-view'/);
@@ -57,10 +57,8 @@ void test('/app uses the transparent crest and navigation-only app view', async 
   );
 });
 
-void test('loading crest is a square RGBA PNG', async () => {
-  const image = await readFile(
-    new URL('public/icon-sc-transparent.png', projectRoot),
-  );
+void test('loading icon is a square RGBA PNG', async () => {
+  const image = await readFile(new URL('public/icon.png', projectRoot));
 
   assert.equal(image.subarray(1, 4).toString('ascii'), 'PNG');
   assert.equal(image.readUInt32BE(16), image.readUInt32BE(20));

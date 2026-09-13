@@ -91,7 +91,7 @@ writeFileSync(
             },
             {
               key: 'Content-Disposition',
-              value: 'attachment; filename="NJustMap-Android.apk"',
+              value: 'attachment; filename="NanliYouli-Android.apk"',
             },
           ],
         },

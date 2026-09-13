@@ -7,7 +7,7 @@ import sharp from 'sharp';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const assets = join(root, 'ios/App/App/Assets.xcassets');
-const source = join(root, 'public/icon-sc-transparent.png');
+const source = join(root, 'public/icon.png');
 const background = { r: 243, g: 242, b: 237, alpha: 1 };
 
 // Respect the sizes and filenames declared by the native asset catalogs.
@@ -49,4 +49,4 @@ for (const [catalog, scale] of [
       .toFile(output);
   }
 }
-console.log('iOS 校徽图标与启动图已生成。');
+console.log('iOS 应用图标与启动图已生成。');

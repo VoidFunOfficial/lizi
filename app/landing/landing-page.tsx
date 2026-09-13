@@ -29,7 +29,7 @@ const routeModes = [
     name: '少走一点',
     icon: Navigation,
     title: '去想去的地方，\n走更直接的路。',
-    text: '从宿舍到教室，从食堂到图书馆。选好目的地，把路上的摸索，交给 NJustMap。',
+    text: '从宿舍到教室，从食堂到图书馆。选好目的地，把路上的摸索，交给南梨有梨。',
     color: '#3475ba',
     path: 'M95 290 L190 290 L190 175 L465 175 L465 105',
     label: '步行路线',
@@ -65,21 +65,14 @@ const routeModes = [
 
 function Mark({ className = '' }: { className?: string }) {
   return (
-    <svg
+    <Image
       className={className}
-      width="30"
-      height="34"
-      viewBox="0 0 30 34"
-      fill="none"
+      src="/icon.png"
+      width={34}
+      height={34}
+      alt=""
       aria-hidden="true"
-    >
-      <path
-        d="M25 13c0 7-10 17-10 17S5 20 5 13a10 10 0 0 1 20 0Z"
-        stroke="currentColor"
-        strokeWidth="2.7"
-      />
-      <circle cx="15" cy="13" r="3.5" fill="currentColor" />
-    </svg>
+    />
   );
 }
 
@@ -247,9 +240,7 @@ export default function LandingPage() {
         <nav className={s.nav} aria-label="官网导航">
           <a className={s.brand} href="#top">
             <Mark />
-            <span>
-              NJustMap<span className={s.brandDot}>.</span>
-            </span>
+            <span>南梨有梨</span>
           </a>
           <div className={s.navLinks}>
             <a href="#explore">探索</a>
@@ -281,7 +272,7 @@ export default function LandingPage() {
             </p>
             <div className={s.actions}>
               <a className={s.primary} href="#download">
-                获取 NJustMap <ArrowDownToLine size={17} />
+                获取南梨有梨 <ArrowDownToLine size={17} />
               </a>
               <a className={s.textLink} href="/app">
                 直接使用 Web 版 <ArrowUpRight size={17} />
@@ -628,12 +619,12 @@ export default function LandingPage() {
               <br />
               <span>都在一起。</span>
             </h2>
-            <p>地图、课表与日程，在 NJustMap 自然相连。</p>
+            <p>地图、课表与日程，在南梨有梨自然相连。</p>
           </Reveal>
           <Reveal className={s.togetherImage}>
             <Image
               src="/site/together.png"
-              alt="NJustMap 宣传片中的地图、课表、日程三屏界面示意"
+              alt="南梨有梨宣传片中的地图、课表、日程三屏界面示意"
               width={1920}
               height={1080}
               sizes="(max-width: 700px) 100vw, 1100px"
@@ -651,7 +642,7 @@ export default function LandingPage() {
         >
           <Reveal className={s.downloadIntro}>
             <Mark className={s.downloadMark} />
-            <span className={s.eyebrow}>NJustMap · 为校园里的每一天</span>
+            <span className={s.eyebrow}>南梨有梨 · 为校园里的每一天</span>
             <h2 id="download-title">
               下一站，<span>从这里出发。</span>
             </h2>
@@ -660,7 +651,7 @@ export default function LandingPage() {
           <Reveal className={s.downloadCards}>
             <a
               href="/api/updates?download=android"
-              download="NJustMap-Android.apk"
+              download="南梨有梨-Android.apk"
               className={`${s.downloadCard} ${s.androidCard}`}
             >
               <Smartphone size={30} strokeWidth={1.5} />
@@ -703,7 +694,7 @@ export default function LandingPage() {
       <footer className={s.footer}>
         <a className={s.brand} href="#top">
           <Mark />
-          <span>NJustMap.</span>
+          <span>南梨有梨</span>
         </a>
         <span>少一点摸索，多一点从容。</span>
         <div>

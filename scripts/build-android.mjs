@@ -149,7 +149,7 @@ if (Number(process.versions.node.split('.')[0]) < 22) {
 process.chdir(projectRoot);
 const pnpm = executable('pnpm');
 
-console.log(`NJUST 校园导航 Android 打包（${mode}）`);
+console.log(`南梨有梨 Android 打包（${mode}）`);
 run(pnpm, ['install', '--frozen-lockfile']);
 if (!skipChecks) {
   run(pnpm, ['test']);

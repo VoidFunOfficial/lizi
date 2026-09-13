@@ -45,8 +45,8 @@ export default function AppPage() {
             <div className="app-loading-mark">
               <Image
                 className="app-loading-logo app-loading-logo-base"
-                src="/icon-sc-transparent.png"
-                alt="南京理工大学校徽"
+                src="/icon.png"
+                alt="南梨有梨图标"
                 width={196}
                 height={196}
                 priority
@@ -55,7 +55,7 @@ export default function AppPage() {
               <span className="app-loading-fill" aria-hidden="true">
                 <Image
                   className="app-loading-logo"
-                  src="/icon-sc-transparent.png"
+                  src="/icon.png"
                   alt=""
                   width={196}
                   height={196}

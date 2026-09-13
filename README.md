@@ -1,4 +1,4 @@
-# NJUST 校园混合通行导航
+# 南梨有梨
 
 [![CNB CI](https://cnb.cool/voidfun/njustmap/-/badge/ci/status/push)](https://cnb.cool/voidfun/njustmap/-/build/logs)
 

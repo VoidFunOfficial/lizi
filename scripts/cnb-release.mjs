@@ -56,7 +56,7 @@ const assets = [...files, 'SHA256SUMS.txt'].map((name) => ({
 const notesPath = `docs/releases/${tag}.md`;
 const notes = existsSync(notesPath)
   ? readFileSync(notesPath, 'utf8')
-  : `NJUST 校园导航 ${tag}\n\n${readFileSync(join(directory, 'BUILD-INFO.txt'), 'utf8')}`;
+  : `南梨有梨 ${tag}\n\n${readFileSync(join(directory, 'BUILD-INFO.txt'), 'utf8')}`;
 await publishRelease({
   api: cnbApi(process.env.CNB_TOKEN),
   tag,

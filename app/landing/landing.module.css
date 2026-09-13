@@ -82,8 +82,10 @@
   font-weight: 600;
   letter-spacing: -1px;
 }
-.brand svg {
-  width: 23px;
+.brand img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
 }
 .brandDot {
   color: var(--blue);
@@ -924,8 +926,8 @@
   text-align: center;
 }
 .downloadMark {
-  width: 44px;
-  height: 50px;
+  width: 52px;
+  height: 52px;
   margin: 0 auto 25px;
   color: var(--green);
 }
@@ -1022,9 +1024,9 @@ a.downloadCard:hover {
 .footer .brand {
   font-size: 16px;
 }
-.footer .brand svg {
-  width: 19px;
-  height: 25px;
+.footer .brand img {
+  width: 28px;
+  height: 28px;
 }
 .footer > span {
   font-size: 10px;
@@ -1135,9 +1137,9 @@ a.downloadCard:hover {
     font-size: 18px;
     gap: 6px;
   }
-  .brand svg {
-    width: 20px;
-    height: 27px;
+  .brand img {
+    width: 30px;
+    height: 30px;
   }
   .navLinks {
     display: none;

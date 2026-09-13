@@ -7,11 +7,11 @@ import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const source = join(projectRoot, 'public/icon-sc-transparent.png');
+const source = join(projectRoot, 'public/icon.png');
 const resources = join(projectRoot, 'android/app/src/main/res');
 const background = { r: 243, g: 242, b: 237, alpha: 1 };
 
-if (!existsSync(source)) throw new Error(`找不到校徽源文件：${source}`);
+if (!existsSync(source)) throw new Error(`找不到应用源文件：${source}`);
 if (!existsSync(resources))
   throw new Error(`找不到 Android 资源目录：${resources}`);
 
@@ -116,4 +116,4 @@ await Promise.all(
   splashFiles.map((file) => renderSplash(join(resources, file))),
 );
 
-console.log('Android 校徽图标与启动图已生成。');
+console.log('Android 应用图标与启动图已生成。');

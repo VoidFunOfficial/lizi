@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0 (2026-09-13)
+
+- 正式更名为「南梨有梨」，同步官网、应用内界面及 Android/iOS 显示名称。
+- 使用全新梨子导航图标，统一官网、启动页与 Android/iOS 应用图标。
+- 沿用原有应用 ID、Android 正式签名与 CNB 自动更新渠道。
+
 ## 1.1.1
 
 - Migrate CI, Android releases, website deployment and update checks to CNB.
